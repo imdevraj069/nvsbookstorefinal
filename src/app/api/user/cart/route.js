@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import connectDB from "@/lib/dbConnect"
-import Cart from "@/models/Cart"
+import Cart from "@/models/cart"
 import Product from "@/models/product" // required for populate
 
 export async function GET(req) {
