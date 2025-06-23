@@ -1,6 +1,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import PageTransition from "@/components/layout/page-transition";
+import { Toaster } from "react-hot-toast";
 import Footer from "@/components/layout/footer";
 import Navbar from "@/components/layout/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -29,6 +30,17 @@ export default function RootLayout({ children }) {
         >
           <Providers>
             <PageTransition>
+              <Toaster
+                position="top-right"
+                reverseOrder={false}
+                toastOptions={{
+                  className: "bg-gray-800 text-white",
+                  style: {
+                    fontSize: "0.875rem",
+                    padding: "0.5rem 1rem",
+                  },
+                }}
+              />
               <Navbar />
               {children}
               <Footer />
