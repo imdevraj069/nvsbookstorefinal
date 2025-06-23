@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import connectDB from "@/lib/dbConnect"
 import Cart from "@/models/cart"
-import Product from "@/models/product" // required for populate
+import {Product} from "@/models/product"
 
 export async function GET(req) {
   const session = await getServerSession(authOptions)
