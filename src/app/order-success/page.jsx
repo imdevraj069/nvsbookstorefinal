@@ -20,7 +20,6 @@ export default function OrderSuccessPage() {
       try {
         const res = await axios.get(`/api/admin/orders/${orderId}`)
 
-        console.log(res.data)
         if (res.data.success) {
           setOrder(res.data.data)
         } else {

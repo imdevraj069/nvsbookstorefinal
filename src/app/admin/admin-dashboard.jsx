@@ -466,9 +466,7 @@ export default function AdminDashboard() {
 
   const handleProductToggleVisibility = async (id) => {
     try {
-      console.log(id)
       const res = await axios.patch(`/api/product/${id}`);
-      console.log(res)
       const updated = await res.data.data;
       toast.success("Product visibility updated successfully!");
       setProduct((prev) =>
