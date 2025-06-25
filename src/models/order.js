@@ -18,11 +18,15 @@ const orderSchema = new mongoose.Schema(
     },
     items: [
       {
-        _id: mongoose.Schema.Types.ObjectId,
-        title: String,
-        price: Number,
-        quantity: Number,
-        isDigital: Boolean,
+        product: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Product",
+          required: true,
+        },
+        quantity: {
+          type: Number,
+          required: true,
+        },
       },
     ],
     paymentMethod: String,
