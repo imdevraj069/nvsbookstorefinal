@@ -27,10 +27,6 @@ import { Badge } from "@/components/ui/badge";
 
 // External imports
 import toast from "react-hot-toast";
-import {
-  createNotificationHandler,
-  // updateNotificationHandler,
-} from "@/handler/notification";
 // import {
 //   createProductHandler,
 //   updateProductnHandler,
@@ -155,7 +151,6 @@ export default function AdminDashboard() {
     const fetchCategories = async () => {
       try {
         const res = await axios.get("/api/notification?type=category");
-        console.log(res)
         const data = await res.data.data;
         setCategories(data);
       } catch (err) {
@@ -240,7 +235,6 @@ export default function AdminDashboard() {
     try {
       const res = await axios.post("/api/notification?type=category",{data:newCategory});
       const data = res.data.data
-      console.log(data)
       setCategories((prev) => [...prev, data]);
       setFormData((prev) => ({ ...prev, category: data._id }));
       setNewCategory("");
@@ -292,9 +286,7 @@ export default function AdminDashboard() {
     try {
       console.log(id)
       const res = await axios.patch(`/api/notification/${id}`);
-      if(!res.data.success){
-        toast.error(res.data.message)
-      }
+      console.log(res)
 
       const updated = await res.data.data;
       toast.success("Notification visibility updated successfully!");
@@ -310,14 +302,15 @@ export default function AdminDashboard() {
   };
 
   const handleDeleteNotification = async (id) => {
+    console.log(id)
     if (!confirm("Are you sure you want to delete this notification?")) return;
 
     try {
-      const res = await fetch(`/api/notification/${id}`, {
-        method: "DELETE",
-      });
+      const res = await axios.patch(`/api/notification/${id}`);
 
-      if (!res.ok) throw new Error("Failed to delete notification");
+      if (!res.data.success){
+        toast.error(res.data.message)
+      }
 
       setNotifications((prev) => prev.filter((n) => n._id !== id));
       toast.success("Notification deleted successfully!");
@@ -348,7 +341,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const res = await axios.get("/api/product?type=product");
+        const res = await fetch("/api/product?type=product");
         if (!res.ok) throw new Error("Failed to fetch product");
 
         const data = await res.json();

@@ -1,7 +1,8 @@
 import connectDB from "@/lib/dbConnect";
 import {Notification} from "@/models/notification"
 
-import {toggleVisibility} from "../../../../handler/notification"
+import {toggleVisibility, deleteNotification} from "../../../../handler/notification"
+import { detectConflictingPaths } from "next/dist/build/utils";
 
 
 export async function GET(req, {params}){
@@ -36,7 +37,6 @@ export async function PUT(req, { params }) {
 // ✅ PATCH - Update a single field (e.g., visibility)
 export async function PATCH(req, { params }) {
   try {
-    await connectDB();
     const param = await params;
     const res = await toggleVisibility(param.id);
     console.log(res)
@@ -48,13 +48,11 @@ export async function PATCH(req, { params }) {
 
 // ✅ DELETE - Remove notification
 export async function DELETE(req, { params }) {
+  console.log("hello from not del api")
   try {
-    await connectDB();
-    
     const param = await params;
-    const deleted = await Notification.findByIdAndDelete(param.id);
-    if (!deleted) return Response.json({ error: "Notification not found" }, { status: 404 });
-    return Response.json({ message: "Notification deleted successfully" });
+    const deleted = await deleteNotification(param.id);
+    return Response.json(deleted);
   } catch (err) {
     return Response.json({ error: err.message }, { status: 500 });
   }

@@ -149,3 +149,28 @@ export async function toggleVisibility(id){
   }
 
 }
+
+export async function deleteNotification(id){
+  console.log("hit made here ... llfdjvjkdv dv khsubv hjdb hbj sb")
+  await connectDB()
+  try {
+    const deleted = await Notification.findByIdAndDelete(id);
+    if (!deleted){
+      return{
+        success: false,
+        message: "Notification not found",
+      }
+    }
+    await redis.del("notification")
+    return{
+      success: true,
+      message: "Notification deleted successfully",
+    }
+  } catch (error) {
+    return       {
+        success: false,
+        message: "Something went wrong while deleting notification",
+        error
+      }
+  }
+}
