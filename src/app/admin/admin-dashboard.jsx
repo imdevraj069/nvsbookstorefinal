@@ -27,10 +27,6 @@ import { Badge } from "@/components/ui/badge";
 
 // External imports
 import toast from "react-hot-toast";
-import {
-  createNotificationHandler,
-  // updateNotificationHandler,
-} from "@/handler/notification";
 // import {
 //   createProductHandler,
 //   updateProductnHandler,
@@ -155,7 +151,6 @@ export default function AdminDashboard() {
     const fetchCategories = async () => {
       try {
         const res = await axios.get("/api/notification?type=category");
-        console.log(res)
         const data = await res.data.data;
         setCategories(data);
       } catch (err) {
@@ -200,14 +195,14 @@ export default function AdminDashboard() {
 
     if (editMode) {
       try {
-        // const res = await updateNotificationHandler(currentEditId, dataToSend);
-        // setNotifications((prev) =>
-        //   prev.map((not) =>
-        //     not._id === currentEditId
-        //       ? { ...not, ...formData, category: selectedCategory }
-        //       : not
-        //   )
-        // );
+        const res = await axios.put(`/api/notification/${currentEditId}`, dataToSend);
+        setNotifications((prev) =>
+          prev.map((not) =>
+            not._id === currentEditId
+              ? { ...not, ...formData, category: selectedCategory }
+              : not
+          )
+        );
         toast.success("Notification updated successfully");
       } catch (error) {
         console.error("Error updating notification:", error);
@@ -240,7 +235,6 @@ export default function AdminDashboard() {
     try {
       const res = await axios.post("/api/notification?type=category",{data:newCategory});
       const data = res.data.data
-      console.log(data)
       setCategories((prev) => [...prev, data]);
       setFormData((prev) => ({ ...prev, category: data._id }));
       setNewCategory("");
@@ -290,12 +284,7 @@ export default function AdminDashboard() {
 
   const handleToggleVisibility = async (id) => {
     try {
-      console.log(id)
       const res = await axios.patch(`/api/notification/${id}`);
-      if(!res.data.success){
-        toast.error(res.data.message)
-      }
-
       const updated = await res.data.data;
       toast.success("Notification visibility updated successfully!");
       setNotifications((prev) =>
@@ -313,11 +302,11 @@ export default function AdminDashboard() {
     if (!confirm("Are you sure you want to delete this notification?")) return;
 
     try {
-      const res = await fetch(`/api/notification/${id}`, {
-        method: "DELETE",
-      });
+      const res = await axios.delete(`/api/notification/${id}`);
 
-      if (!res.ok) throw new Error("Failed to delete notification");
+      if (!res.data.success){
+        toast.error(res.data.message)
+      }
 
       setNotifications((prev) => prev.filter((n) => n._id !== id));
       toast.success("Notification deleted successfully!");
@@ -327,15 +316,15 @@ export default function AdminDashboard() {
     }
   };
 
-  // ==================== PRODUCTS TAB ====================
+  // ============================================================= PRODUCTS TAB =============================================================
   // Products handlers (to be implemented)
   // Add product-related handlers here when needed
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch("/api/product?type=category");
-        const data = await res.json();
+        const res = await axios.get("/api/product?type=category");
+        const data = await res.data.data;
         setProductCategories(data);
       } catch (err) {
         console.error("Failed to fetch categories", err);
@@ -348,10 +337,8 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const res = await axios.get("/api/product?type=product");
-        if (!res.ok) throw new Error("Failed to fetch product");
-
-        const data = await res.json();
+        const res = await axios.get("/api/product"); 
+        const data = await res.data.data;
         setProduct(data);
       } catch (err) {
         console.error("Error fetching notifications:", err);
@@ -374,14 +361,14 @@ export default function AdminDashboard() {
     };
     if (editProductMode) {
       try {
-        // const res = await updateProductnHandler(currentEditProductId, dataToSend);
-        // setProduct((prev) =>
-        //   prev.map((not) =>
-        //     not._id === currentEditProductId
-        //       ? { ...not, ...productFormDataState, category: selectedCategory }
-        //       : not
-        //   )
-        // );
+        const res = await axios.put(`/api/product/${currentEditProductId}`, dataToSend);
+        setProduct((prev) =>
+          prev.map((not) =>
+            not._id === currentEditProductId
+              ? { ...not, ...productFormDataState, category: selectedCategory }
+              : not
+          )
+        );
         toast.success("Product updated successfully");
       } catch (error) {
         console.error("Error updating notification:", error);
@@ -394,8 +381,9 @@ export default function AdminDashboard() {
       }
     } else {
       try {
-        // const newNotification = await createProductHandler(dataToSend);
-        // setProduct((prev) => [...prev, newNotification]);
+        const res = await axios.post("/api/product",{data:dataToSend});
+        const newNotification = res.data.data
+        setProduct((prev) => [...prev, newNotification]);
         toast.success("Notification created successfully");
       } catch (err) {
         console.error("Failed to add notification", err);
@@ -459,11 +447,12 @@ export default function AdminDashboard() {
     if (!newProductCategory.trim()) return;
 
     try {
-      // const data = await createProductCatHandler(newProductCategory);
-      // setProductCategories((prev) => [...prev, data]);
-      // setProductFormDataState((prev) => ({ ...prev, category: data._id }));
-      // setNewProductCategory("");
-      // setAddProductCategoryMode(false);
+      const res = await axios.post("/api/product?type=category",{data:newProductCategory});
+      const data = res.data.data
+      setProductCategories((prev) => [...prev, data]);
+      setProductFormDataState((prev) => ({ ...prev, category: data._id }));
+      setNewProductCategory("");
+      setAddProductCategoryMode(false);
       toast.success("Category created successfully");
     } catch (err) {
       console.error("Failed to add category:", err);
@@ -479,17 +468,12 @@ export default function AdminDashboard() {
 
   }
 
-  const handleProductToggleVisibility = async (id, currentVisibility) => {
+  const handleProductToggleVisibility = async (id) => {
     try {
-      const res = await fetch(`/api/product/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isVisible: !currentVisibility }),
-      });
-
-      if (!res.ok) throw new Error("Failed to update visibility");
-
-      const updated = await res.json();
+      console.log(id)
+      const res = await axios.patch(`/api/product/${id}`);
+      console.log(res)
+      const updated = await res.data.data;
       toast.success("Product visibility updated successfully!");
       setProduct((prev) =>
         prev.map((not) =>
@@ -506,11 +490,11 @@ export default function AdminDashboard() {
     if (!confirm("Are you sure you want to delete this product?")) return;
 
     try {
-      const res = await fetch(`/api/product/${id}`, {
-        method: "DELETE",
-      });
+      const res = await axios.delete(`/api/product/${id}`);
 
-      if (!res.ok) throw new Error("Failed to delete product");
+      if (!res.data.success){
+        toast.error(res.data.message)
+      };
 
       setProduct((prev) => prev.filter((n) => n._id !== id));
       toast.success("Product deleted successfully!");
@@ -943,7 +927,11 @@ export default function AdminDashboard() {
                             )
                           }}
                           >
-                            <Eye className="h-4 w-4" />
+                            {!product.isVisible ? (
+                              <EyeOff className="w-4 h-4" />
+                            ) : (
+                              <Eye className="w-4 h-4" />
+                            )}
                           </Button>
                           <Button
                           size="sm" variant="ghost"

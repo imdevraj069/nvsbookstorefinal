@@ -1,4 +1,4 @@
-import {getProductbyId} from '../../../../handler/product';
+import {getProductbyId, toggleVisibility, deleteCategory, updateCategory} from '../../../../handler/product';
 
 export async function GET(req, {params}){
   await connectDB()
@@ -8,4 +8,37 @@ export async function GET(req, {params}){
   if(!product) return Response.json( {error: "Product not found"}, {status: 404} )
 
   return Response.json(product)
+}
+
+
+export async function PUT(req, { params }) {
+  try {
+    const param = await params;
+    const body = await req.json();
+    const updated =  await updateCategory(param.id, body);
+    if (!updated) return Response.json({ error: "Category not found" }, { status: 404 });
+    return Response.json(updated);
+  } catch (error) {
+    return Response.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function PATCH(req, { params }) {
+  try {
+    const param = await params;
+    const res = await toggleVisibility(param.id);
+    return Response.json(res);
+  } catch (error) {
+    return Response.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function DELETE(req, { params }) {
+  try {
+    const param = await params;
+    const res = await deleteCategory(param.id);
+    return Response.json(res);
+  } catch (error) {
+    return Response.json({ error: error.message }, { status: 500 });
+  }
 }

@@ -50,7 +50,8 @@ export async function POST(req, { params }) {
 
 export async function PUT(req, { params }) {
   await connectDB();
-  const { userId } = params;
+  const param = await params
+  const { userId } = param;
   const { newPassword } = await req.json();
 
   if (!newPassword || newPassword.length < 6) {
