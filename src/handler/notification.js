@@ -2,6 +2,7 @@ import { Notification, NotificationCategory } from "../models/notification";
 import connectDB from "@/lib/dbConnect";
 import { redis } from "@/lib/redis";
 
+
 export async function getNotifications() {
   await connectDB();
 
@@ -9,6 +10,7 @@ export async function getNotifications() {
 
   const cached = await redis.get(cachekey);
   if (cached) {
+    ( "Cache hit" );
     return { source: "redis", data: cached };
   }
 
@@ -112,7 +114,7 @@ export async function createNotificationHandler(data){
     },
   });
 
-  await redis.del("notification")
+  await redis.del("notifications")
 
   return{
     success: true,
@@ -128,6 +130,7 @@ export async function toggleVisibility(id){
     try {
       notification.isVisible = !notification.isVisible
       await notification.save()
+      await redis.del("notifications" )
       return{
         success: true,
         message: "Visibility toggled successfully",
@@ -151,7 +154,6 @@ export async function toggleVisibility(id){
 }
 
 export async function deleteNotification(id){
-  console.log("hit made here ... llfdjvjkdv dv khsubv hjdb hbj sb")
   await connectDB()
   try {
     const deleted = await Notification.findByIdAndDelete(id);
@@ -161,10 +163,11 @@ export async function deleteNotification(id){
         message: "Notification not found",
       }
     }
-    await redis.del("notification")
+    await redis.del("notifications")
     return{
       success: true,
       message: "Notification deleted successfully",
+      data: deleted
     }
   } catch (error) {
     return       {
@@ -174,3 +177,29 @@ export async function deleteNotification(id){
       }
   }
 }
+
+export async function updateNotification(id, data){
+  await connectDB()
+  try {
+    const updated = await Notification.findByIdAndUpdate(id, data, {new: true});
+    if (!updated){
+      return{
+        success: false,
+        message: "Notification not found",
+      }
+    }
+    await redis.del("notifications")
+    return {
+      success: true,
+      message: "Notification updated successfully",
+      data: updated
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message: "Something went wrong while updating notification",
+      error
+    }
+  }
+}
+
