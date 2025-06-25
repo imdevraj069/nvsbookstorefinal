@@ -74,7 +74,7 @@ export default function NotificationCategoryPage() {
     async function fetchNotifications() {
       setLoading(true);
       try {
-        const res = await axios.get(`/api/notification?type=bycategory?category=${category}`);
+        const res = await axios.get(`/api/notification?type=bycategory&category=${category}`);
         const notifications = res.data.data;
         setAllNotifications(notifications);
       } catch (err) {

@@ -2,15 +2,25 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Star, Minus, Plus, ShoppingCart, Heart, Share2 } from "lucide-react";
+import {
+  Star,
+  Minus,
+  Plus,
+  ShoppingCart,
+  Heart,
+  Share2,
+  Bell,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-// import AddToCartButton from "@/components/store/add-to-cart";
+import AddToCartButton from "@/components/store/add-to-cart";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 export default function ProductDetail({ product }) {
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("description");
+  const [notifying, setNotifying] = useState(false);
 
   const {
     title,
@@ -24,7 +34,7 @@ export default function ProductDetail({ product }) {
     rating,
     reviews,
     category,
-    inStock,
+    stock,
     isDigital,
     author,
     publisher,
@@ -32,14 +42,18 @@ export default function ProductDetail({ product }) {
     language,
     isbn,
   } = product;
-
   // Calculate discount percentage if there's an original price
+  const isOutOfStock = stock === 0;
   const discountPercentage = originalPrice
     ? Math.round(((originalPrice - price) / originalPrice) * 100)
     : 0;
 
   const incrementQuantity = () => setQuantity((prev) => prev + 1);
   const decrementQuantity = () => setQuantity((prev) => Math.max(prev - 1, 1));
+
+  const handleNotify = async () =>{
+    toast.success("You will be notifed")
+  }
 
   return (
     <div className="mb-12">
@@ -138,43 +152,21 @@ export default function ProductDetail({ product }) {
             )}
           </div>
 
-          {/* Quantity Selector */}
-          {!isDigital && (
-            <div className="flex items-center mb-6">
-              <span className="text-sm font-semibold mr-4">Quantity:</span>
-              <div className="flex items-center border border-border rounded-md">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={decrementQuantity}
-                  disabled={quantity <= 1}
-                  className="h-8 w-8"
-                >
-                  <Minus className="h-3 w-3" />
-                </Button>
-                <span className="w-8 text-center">{quantity}</span>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={incrementQuantity}
-                  className="h-8 w-8"
-                >
-                  <Plus className="h-3 w-3" />
-                </Button>
-              </div>
-            </div>
-          )}
-
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 mb-6">
-            <Button asChild className="w-full mt-3">
-              <Link href={`/checkout?productId=${product._id}`}>Buy Now</Link>
-            </Button>
-
-            <div className=" border-2 border-red-500 rounded-md flex justify-center items-center">
-              {/* <AddToCartButton product={product} /> */}
-            </div>
-
+            {!isOutOfStock ? (
+              <AddToCartButton product={product} />
+            ) : (
+              <Button
+                size="lg"
+                variant="default"
+                onClick={handleNotify}
+                disabled={notifying}
+              >
+                <Bell className="h-4 w-4 mr-2" />
+                {notifying ? "Subscribing..." : "Notify Me"}
+              </Button>
+            )}
             <Button size="lg" variant="outline" className="sm:w-auto">
               <Share2 className="h-4 w-4" />
             </Button>
@@ -182,7 +174,7 @@ export default function ProductDetail({ product }) {
 
           {/* Stock Status */}
           <div className="mb-4">
-            {inStock ? (
+            {stock > 0 ? (
               <span className="text-green-600 text-sm font-medium">
                 ✓ In Stock
               </span>
