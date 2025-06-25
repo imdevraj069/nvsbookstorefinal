@@ -51,3 +51,5 @@ export async function createOrderHandler(req) {
     }
   }
 }
+
+export async function getOrdersHandler(id){}
