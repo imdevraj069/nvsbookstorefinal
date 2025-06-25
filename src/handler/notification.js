@@ -20,7 +20,6 @@ export async function getNotifications() {
 
 export async function getNotificationsByCategory(category) {
   await connectDB();
-
   const cacheKey = `notifications:category:${category}`;
 
   // Try to get from Redis cache
@@ -30,7 +29,7 @@ export async function getNotificationsByCategory(category) {
   }
 
   // If not in cache, fetch from MongoDB
-  const filtered = await Notification.find({ category })
+  const filtered = await Notification.find({ "category.slug": category })
     .sort({ date: -1 })
     .lean();
 
@@ -53,4 +52,100 @@ export async function getNotfCatHandler() {
   await redis.set(cachekey, categories, { ex: 3600 });
 
   return { source: "mongo", data: categories };
+}
+
+export async function getNotificationById(id){
+  await connectDB();
+  const notification = await Notification.findById(id).lean();
+  return Response.json(notification);
+}
+
+export async function createNotCatHandler(newCategory) {
+  if (!newCategory.trim()) throw new Error("Category name is required");
+
+  const categoryName = newCategory.trim();
+  const categorySlug = categoryName.toLowerCase().replace(/\s+/g, "-");
+
+  await connectDB();
+
+  try {
+    // Check if category with the same slug already exists
+    const existing = await NotificationCategory.findOne({ slug: categorySlug });
+    if (existing) {
+      return { success: false, message: "Category already exists" };
+    }
+
+    // Create new category
+    const category = new NotificationCategory({
+      name: categoryName,
+      slug: categorySlug,
+    });
+
+    await category.save();
+
+    // Clear Redis cache so fresh list is fetched next time
+    await redis.del("notfCat");
+
+    return {
+      success: true,
+      message: "Category created successfully",
+      data: category,
+    };
+  } catch (error) {
+    console.error("❌ Error creating category:", error);
+    return {
+      success: false,
+      message: "Something went wrong while creating category",
+      error: error.message,
+    };
+  }
+}
+
+export async function createNotificationHandler(data){
+  await connectDB()
+  const newNotification = await Notification.create({
+    ...data,
+    category: {
+      name: data.category.name,
+      slug: data.category.slug,
+      description: data.category.description || "",
+    },
+  });
+
+  await redis.del("notification")
+
+  return{
+    success: true,
+    message: "Notification created successfully",
+    data: newNotification
+  }
+}
+
+export async function toggleVisibility(id){
+  await connectDB()
+  const notification = await Notification.findById(id)
+  if(notification){
+    try {
+      notification.isVisible = !notification.isVisible
+      await notification.save()
+      return{
+        success: true,
+        message: "Visibility toggled successfully",
+        data: notification
+      }
+    } catch (error) {
+      console.error("❌ Error toggling visibility:", error);
+      return {
+        success: false,
+        message: "Something went wrong while toggling visibility",
+        error: error.message
+      }
+    }
+  }else{
+    return{
+      success: false,
+      message: "Notification not found",
+    }
+  }
+
 }

@@ -27,7 +27,6 @@ export const useCartStore = create(
       loadCartFromDB: async (force = false) => {
         if ( get().loaded) return;
         try {
-          console.log("loading from db")
           const res = await axios.get("/api/user/cart");
           const items = res.data.cartItems || [];
 
