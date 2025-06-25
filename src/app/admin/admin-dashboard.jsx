@@ -27,11 +27,7 @@ import { Badge } from "@/components/ui/badge";
 
 // External imports
 import toast from "react-hot-toast";
-// import {
-//   createProductHandler,
-//   updateProductnHandler,
-//   createProductCatHandler,
-// } from "../../handler/product";
+import OrdersAdmin from "../../components/store/order-admin";
 import Image from "next/image";
 
 export default function AdminDashboard() {
@@ -44,7 +40,7 @@ export default function AdminDashboard() {
     { id: "notifications", label: "Notifications" },
     { id: "products", label: "Products" },
     { id: "users", label: "Users" },
-    { id: "analytics", label: "Analytics" },
+    { id: "orders", label: "Orders" },
   ];
 
   // ==================== OVERVIEW TAB ====================
@@ -1211,14 +1207,9 @@ export default function AdminDashboard() {
 
       {/* Analytics Tab */}
       {/* Commented out as in original - can be uncommented when needed */}
-      {/* {activeTab === "analytics" && (
-        <div className="space-y-6">
-          <div className="bg-card border border-border rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">Analytics & Reports</h2>
-            <p className="text-muted-foreground">Analytics dashboard will be implemented here.</p>
-          </div>
-        </div>
-      )} */}
+      {activeTab === "orders" && (
+        <OrdersAdmin />
+      )}
     </div>
   );
 }
