@@ -1,6 +1,6 @@
 // app/api/upload/route.js
 import { NextResponse } from "next/server";
-import cloudinary from "@/lib/cloudinary";
+import { uploadToCloudinary } from "@/handler/uploadToCloudinary";
 
 export async function POST(req) {
   try {
@@ -11,21 +11,11 @@ export async function POST(req) {
       return NextResponse.json({ error: "No file uploaded." }, { status: 400 });
     }
 
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+    const result = await uploadToCloudinary(file);
 
-    const uploadResult = await new Promise((resolve, reject) => {
-      cloudinary.uploader
-        .upload_stream({ resource_type: "image", folder: "products" }, (err, result) => {
-          if (err) reject(err);
-          resolve(result);
-        })
-        .end(buffer);
-    });
-
-    return NextResponse.json({ url: uploadResult.secure_url });
+    return NextResponse.json({ url: result.secure_url, folder: result.folder });
   } catch (err) {
-    console.error("Cloudinary upload failed", err);
+    console.error("Cloudinary upload failed:", err);
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
 }

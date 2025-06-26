@@ -76,6 +76,7 @@ export default function ProfilePage() {
 
   const handleCancel = () => {
     setProfileData({ ...originalData }); // Revert changes from in-memory copy
+    setIsEditing(false);
   };
 
   if (status === "loading" || loading) {
@@ -128,7 +129,7 @@ export default function ProfilePage() {
             <h2 className="text-xl font-semibold mb-2">{profileData.name}</h2>
             <p className="text-muted-foreground mb-4">{profileData.email}</p>
             {isEditing && (
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" disabled >
                 Change Photo
               </Button>
             )}
