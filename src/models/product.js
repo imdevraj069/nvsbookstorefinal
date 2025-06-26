@@ -128,6 +128,10 @@ const productSchema = new mongoose.Schema(
       type: Object,
       default: {},
     },
+    digitalUrl: {
+      type: String,
+      default: "",
+    },
   },
   {
     timestamps: true,

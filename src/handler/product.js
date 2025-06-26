@@ -105,36 +105,6 @@ export async function createProducthandler(data){
   }
 }
 
-export async function toggleVisibility(id){
-  await connectDB()
-  const category = await Product.findById(id)
-  if(category){
-    try {
-      category.isVisible = !category.isVisible
-      await category.save()
-      await redis.del("products" )
-      return{
-        success: true,
-        message: "Visibility toggled successfully",
-        data: category
-      }
-    } catch (error) {
-      console.error("❌ Error toggling visibility:", error);
-      return {
-        success: false,
-        message: "Something went wrong while toggling visibility",
-        error: error.message
-      }
-    }
-  }else{
-    return{
-      success: false,
-      message: "Notification not found",
-    }
-  }
-
-}
-
 export async function deleteCategory(id){
   await connectDB()
   try {
@@ -182,5 +152,37 @@ export async function updateCategory(id, data){
       message: "Something went wrong while updating category",
       error
     }
+  }
+}
+
+export async function toggleField({ id, field, model, cacheKey = "products" }) {
+  await connectDB();
+
+  const item = await model.findById(id);
+  if (!item) {
+    return {
+      success: false,
+      message: `${model.modelName} not found`,
+    };
+  }
+
+  try {
+    item[field] = !item[field];
+    await item.save();
+
+    if (cacheKey) await redis.del(cacheKey);
+
+    return {
+      success: true,
+      message: `${field} toggled successfully`,
+      data: item,
+    };
+  } catch (error) {
+    console.error(`❌ Error toggling ${field}:`, error);
+    return {
+      success: false,
+      message: `Something went wrong while toggling ${field}`,
+      error: error.message,
+    };
   }
 }

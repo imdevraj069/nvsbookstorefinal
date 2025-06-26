@@ -1,4 +1,4 @@
-import {getProductbyId, toggleVisibility, deleteCategory, updateCategory} from '../../../../handler/product';
+import {getProductbyId, toggleField, toggleVisibility, deleteCategory, updateCategory, toggleFeatured} from '../../../../handler/product';
 
 export async function GET(req, {params}){
   await connectDB()
@@ -18,16 +18,6 @@ export async function PUT(req, { params }) {
     const updated =  await updateCategory(param.id, body);
     if (!updated) return Response.json({ error: "Category not found" }, { status: 404 });
     return Response.json(updated);
-  } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
-  }
-}
-
-export async function PATCH(req, { params }) {
-  try {
-    const param = await params;
-    const res = await toggleVisibility(param.id);
-    return Response.json(res);
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }

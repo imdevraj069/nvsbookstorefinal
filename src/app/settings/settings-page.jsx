@@ -223,6 +223,7 @@ export default function SettingsPage() {
                       size="icon"
                       variant="outline"
                       className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full"
+                      disabled
                       // Optional: Add image upload trigger here
                     >
                       <Camera className="h-4 w-4" />
@@ -234,7 +235,7 @@ export default function SettingsPage() {
                     <p className="text-sm text-muted-foreground">
                       {profileData.email}
                     </p>
-                    <Button variant="outline" size="sm" className="mt-2">
+                    <Button variant="outline" size="sm" className="mt-2" disabled>
                       Change Photo
                     </Button>
                   </div>
