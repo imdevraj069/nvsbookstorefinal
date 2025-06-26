@@ -92,6 +92,7 @@ export default function CheckoutForm() {
       }
 
       const result = await axios.post("/api/user/checkout", orderData);
+      console.log(result)
 
       if (result.data.success) {
         await clearCartAndSync(); // clears both local and remote cart

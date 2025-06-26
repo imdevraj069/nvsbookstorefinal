@@ -17,7 +17,7 @@ export const renderUserOrderConfirmationEmail = (order) => `
           <p>${order.shippingAddress.address}, ${order.shippingAddress.city}, ${order.shippingAddress.state} - ${order.shippingAddress.pincode}</p>
           <h3>Items</h3>
           <ul style="padding-left:20px">
-            ${order.items.map(item => `<li>${item.title} x ${item.quantity}</li>`).join("")}
+            ${order.items.map(item => `<li>${item.product.title} x ${item.quantity}</li>`).join("")}
           </ul>
         </td></tr>
         <tr><td style="padding:0 24px 24px 24px">
@@ -45,7 +45,7 @@ export const renderAdminOrderNotificationEmail = (order) => `
           <p><strong>Total:</strong> ₹${order.price.total}</p>
           <h3>Items</h3>
           <ul style="padding-left:20px">
-            ${order.items.map(item => `<li>${item.title} x ${item.quantity}</li>`).join("")}
+            ${order.items.map(item => `<li>${item.product.title} x ${item.quantity}</li>`).join("")}
           </ul>
         </td></tr>
         <tr><td style="padding:0 24px 24px 24px">
