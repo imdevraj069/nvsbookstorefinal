@@ -78,7 +78,7 @@ export async function createOrderHandler(req) {
     });
 
     await sendEmail({
-      to: process.env.ADMIN_EMAIL,
+      to: process.env.TEST_ADMIN_MAIL,
       subject: `📦 New Order: ${customerName}`,
       html: renderAdminOrderNotificationEmail(order),
     });
