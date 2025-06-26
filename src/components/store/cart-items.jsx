@@ -47,12 +47,12 @@ export default function CartItems() {
 
   return (
     <div className="space-y-4">
-      {cartItems.map((item) => {
+      {cartItems.map((item, index) => {
         const id = item._id;
         const isLoading = loadingMap[id];
 
         return (
-          <div key={id} className="flex items-center gap-4 p-4 border border-border rounded-lg">
+          <div key={index} className="flex items-center gap-4 p-4 border border-border rounded-lg">
             <Image
               src={item.image || "/placeholder.svg"}
               alt={item.title}

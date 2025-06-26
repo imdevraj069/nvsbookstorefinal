@@ -19,13 +19,15 @@ export default function CartPage() {
   const loaded = useCartStore((s) => s.loaded);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (status === "loading") return; // wait for session to load
+
+    if (status === "authenticated" && session?.user) {
       loadCartFromDB();
     } else {
-      router.push('/auth')
-      clearCart(); // local cart stays until next login
+      router.push('/auth');
+      clearCart();
     }
-  }, [isAuthenticated]);
+  }, [status, session]);
 
   if (!loaded && isAuthenticated) {
     return (
