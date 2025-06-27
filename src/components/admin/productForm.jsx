@@ -127,15 +127,18 @@ export default function ProductForm({
     });
   };
 
-  const handleImageChange = async (e) => {
+  const handleFileUpload = async (e, type) => {
     const file = e.target.files?.[0];
     if (!file) {
       toast.error("No file selected");
       return;
     }
 
-    if (!file.type.startsWith("image/")) {
-      toast.error("Please select an image file");
+    const isImage = file.type.startsWith("image/");
+    const isPDF = file.type === "application/pdf";
+
+    if ((type === "image" && !isImage) || (type === "pdf" && !isPDF)) {
+      toast.error(`Please select a valid ${type.toUpperCase()} file`);
       return;
     }
 
@@ -155,10 +158,10 @@ export default function ProductForm({
 
       setFormData((prev) => ({
         ...prev,
-        image: data.url,
+        ...(type === "image" ? { image: data.url } : { digitalUrl: data.url }),
       }));
 
-      toast.success("Image uploaded successfully");
+      toast.success(`${type.toUpperCase()} uploaded successfully`);
     } catch (err) {
       console.error(err);
       toast.error("Upload failed");
@@ -167,45 +170,6 @@ export default function ProductForm({
     }
   };
 
-  const handlePDFUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) {
-      toast.error("No file selected");
-      return;
-    }
-
-    if (file.type !== "application/pdf") {
-      toast.error("Please select a PDF file");
-      return;
-    }
-
-    setUploading(true);
-
-    try {
-      const form = new FormData();
-      form.append("file", file);
-
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: form,
-      });
-
-      if (!res.ok) throw new Error("Upload failed");
-      const data = await res.json();
-
-      setFormData((prev) => ({
-        ...prev,
-        digitalUrl: data.url,
-      }));
-
-      toast.success("PDF uploaded successfully");
-    } catch (err) {
-      console.error(err);
-      toast.error("Upload failed");
-    } finally {
-      setUploading(false);
-    }
-  };
 
   const handleAddCategory = async () => {
     if (!newProductCategory.trim()) return;
@@ -411,7 +375,7 @@ export default function ProductForm({
             <Input
               type="file"
               accept="image/*"
-              onChange={handleImageChange}
+              onChange={(e) => handleFileUpload(e, "image")}
               disabled={uploading}
             />
             {uploading && (
@@ -435,7 +399,7 @@ export default function ProductForm({
             <Input
               type="file"
               accept="application/pdf"
-              onChange={handlePDFUpload}
+              onChange={(e) => handleFileUpload(e, "pdf")}
               disabled={uploading}
             />
             {formData.digitalUrl && (
