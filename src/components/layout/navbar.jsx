@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -24,13 +23,13 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"; // ShadCN
 import { ModeToggle } from "@/components/ui/theme-toggeler";
 import { motion, AnimatePresence } from "motion/react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useSession, signOut } from "next-auth/react";
-import { useCartStore } from '@/utils/store/useCartStore';
+import { useCartStore } from "@/utils/store/useCartStore";
 
 export default function Navbar() {
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -51,12 +50,10 @@ export default function Navbar() {
     } else if (status === "unauthenticated") {
       clearCart();
     }
-  }, [status]); // cleaner and reliable
+  }, [status]);
 
   const handleLogout = () => {
-    signOut({
-      callbackUrl: "/",
-    });
+    signOut({ callbackUrl: "/" });
   };
 
   const getInitials = (name) => {
@@ -71,23 +68,17 @@ export default function Navbar() {
   useEffect(() => {
     const controlNavbar = () => {
       const currentScrollY = window.scrollY;
-
       if (currentScrollY < lastScrollY || currentScrollY < 10) {
-        // Scrolling up or near top
         setIsVisible(true);
       } else {
-        // Scrolling down
         setIsVisible(false);
-        // setIsOpen(false); // Close mobile menu when hiding navbar
-        setShowUserMenu(false); // Close user menu when hiding navbar
+        setShowUserMenu(false);
       }
-
       setLastScrollY(currentScrollY);
     };
 
     if (typeof window !== "undefined") {
       window.addEventListener("scroll", controlNavbar);
-
       return () => {
         window.removeEventListener("scroll", controlNavbar);
       };
@@ -101,23 +92,81 @@ export default function Navbar() {
       animate={{ y: isVisible ? 0 : -100 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
     >
-      <div className="container mx-auto px-4 md:px-16 bg-background sticky">
+      <div className="container mx-auto px-4 md:px-16">
         <div className="flex justify-between items-center h-16">
-          {/* logo */}
+          {/* Mobile Sidebar Trigger */}
+          <div className="lg:hidden">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-72 sm:w-80">
+                <div className="p-4 space-y-4">
+                  <Link
+                    href="/"
+                    className="block text-lg font-semibold hover:text-primary"
+                  >
+                    Home
+                  </Link>
+
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Notifications
+                    </p>
+                    <MobileLink href="/notifications/results" title="Results" />
+                    <MobileLink href="/notifications/jobs" title="Jobs" />
+                    <MobileLink
+                      href="/notifications/admit-cards"
+                      title="Admit Cards"
+                    />
+                    <MobileLink
+                      href="/notifications/exam-dates"
+                      title="Exam Dates"
+                    />
+                    <MobileLink
+                      href="/notifications/answer-keys"
+                      title="Answer Keys"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Other
+                    </p>
+                    <MobileLink href="/store?q=laptop" title="Laptops" />
+                    <MobileLink href="/store?q=books" title="Books" />
+                    <MobileLink href="/store?q=notes" title="Notes" />
+                    <MobileLink href="/store?q=pyq" title="Previous Papers" />
+                    <MobileLink href="/store?q=syllabus" title="Syllabus" />
+                    <MobileLink href="/pvc" title="PVC Cards" />
+                    <MobileLink href="/videos" title="Videos" />
+                    <MobileLink href="/blogs" title="Blogs" />
+                    <MobileLink href="/events" title="Events" />
+                  </div>
+
+                  <MobileLink href="/store" title="Store" />
+                  <MobileLink href="/contact" title="Contact" />
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
+
+          {/* Logo */}
           <motion.div
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
             <Link href="/" className="flex items-center space-x-2">
-              <Image src="/logo.png" alt="Logo" width={50} height={50}></Image>
+              <Image src="/logo.png" alt="Logo" width={50} height={50} />
             </Link>
           </motion.div>
 
-          {/* navigation menu */}
+          {/* Desktop Nav */}
           <div className="hidden lg:block">
             <NavigationMenu viewport={false}>
               <NavigationMenuList>
-                {/* Home */}
                 <NavigationMenuItem>
                   <NavigationMenuLink
                     asChild
@@ -127,11 +176,10 @@ export default function Navbar() {
                   </NavigationMenuLink>
                 </NavigationMenuItem>
 
-                {/* Notifications Dropdown */}
                 <NavigationMenuItem>
                   <NavigationMenuTrigger>Notifications</NavigationMenuTrigger>
                   <NavigationMenuContent className="p-0 z-30">
-                    <ul className="grid w-[200px] ">
+                    <ul className="grid w-[200px]">
                       <NavItem href="/notifications/results" title="Result" />
                       <NavItem href="/notifications/jobs" title="Jobs" />
                       <NavItem
@@ -150,7 +198,6 @@ export default function Navbar() {
                   </NavigationMenuContent>
                 </NavigationMenuItem>
 
-                {/* Other Dropdown */}
                 <NavigationMenuItem>
                   <NavigationMenuTrigger>Other</NavigationMenuTrigger>
                   <NavigationMenuContent className="p-0 z-30">
@@ -168,7 +215,6 @@ export default function Navbar() {
                   </NavigationMenuContent>
                 </NavigationMenuItem>
 
-                {/* Store */}
                 <NavigationMenuItem>
                   <NavigationMenuLink
                     asChild
@@ -178,7 +224,6 @@ export default function Navbar() {
                   </NavigationMenuLink>
                 </NavigationMenuItem>
 
-                {/* Contact */}
                 <NavigationMenuItem>
                   <NavigationMenuLink
                     asChild
@@ -191,10 +236,9 @@ export default function Navbar() {
             </NavigationMenu>
           </div>
 
-          {/* right side icons */}
+          {/* Right Icons */}
           <div className="flex items-center space-x-2">
             <ModeToggle />
-
             <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
               <Link href="/cart">
                 <Button
@@ -222,7 +266,7 @@ export default function Navbar() {
               </Link>
             </motion.div>
 
-            {/* User Avatar Menu */}
+            {/* Avatar Menu (fully restored) */}
             <div className="relative user-menu-container">
               <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                 <Avatar
@@ -396,5 +440,13 @@ function NavItem({ href, title }) {
         </Link>
       </NavigationMenuLink>
     </li>
+  );
+}
+
+function MobileLink({ href, title }) {
+  return (
+    <Link href={href} className="block px-2 py-1 text-sm hover:text-primary">
+      {title}
+    </Link>
   );
 }
