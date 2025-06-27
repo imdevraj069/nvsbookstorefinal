@@ -1,6 +1,7 @@
 import { Calendar, ExternalLink, FileText, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import "./global.css"
 
 export default function NotificationDetail({ notification }) {
   const {
@@ -101,7 +102,7 @@ export default function NotificationDetail({ notification }) {
 
         <div className="prose dark:prose-invert max-w-none mb-6">
           <p className="text-lg mb-4">{description}</p>
-          {content && <div dangerouslySetInnerHTML={{ __html: content }} />}
+          {content && <div className="mycontent" dangerouslySetInnerHTML={{ __html: content }} />}
         </div>
 
         <div className="flex flex-wrap gap-3 mb-6">
