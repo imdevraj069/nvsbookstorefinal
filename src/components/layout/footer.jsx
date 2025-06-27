@@ -113,14 +113,20 @@ export default function Footer() {
             &copy; {new Date().getFullYear()} Nvs Book Store. All rights reserved.
           </p>
           <div className="flex space-x-4 mt-4 md:mt-0">
-            <Link href="/privacy-policy" className="text-sm text-muted-foreground hover:text-primary">
+            <Link href="/privacy" className="text-sm text-muted-foreground hover:text-primary">
               Privacy Policy
             </Link>
-            <Link href="/terms-of-service" className="text-sm text-muted-foreground hover:text-primary">
+            <Link href="/terms" className="text-sm text-muted-foreground hover:text-primary">
               Terms of Service
             </Link>
             <Link href="/sitemap" className="text-sm text-muted-foreground hover:text-primary">
               Sitemap
+            </Link>
+            <Link href="/return" className="text-sm text-muted-foreground hover:text-primary">
+              Return & Refund Policy
+            </Link>
+            <Link href="/shipping" className="text-sm text-muted-foreground hover:text-primary">
+              Shiping Policy
             </Link>
           </div>
         </div>
