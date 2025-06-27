@@ -155,14 +155,15 @@ export default function Navbar() {
                   <NavigationMenuTrigger>Other</NavigationMenuTrigger>
                   <NavigationMenuContent className="p-0 z-30">
                     <ul className="grid w-[200px]">
-                      <NavItem href="#" title="Books" />
-                      <NavItem href="#" title="Notes" />
-                      <NavItem href="#" title="PVC Cards" />
-                      <NavItem href="#" title="Previous Papers" />
-                      <NavItem href="#" title="Syllabus" />
-                      <NavItem href="#" title="Videos" />
-                      <NavItem href="#" title="Blogs" />
-                      <NavItem href="#" title="Events" />
+                      <NavItem href="/store?q=laptop" title="Laptops" />
+                      <NavItem href="/store?q=books" title="Books" />
+                      <NavItem href="/store?q=notes" title="Notes" />
+                      <NavItem href="/store?q=pyq" title="Previous Papers" />
+                      <NavItem href="/store?q=syllabus" title="Syllabus" />
+                      <NavItem href="/pvc" title="PVC Cards" />
+                      <NavItem href="/videos" title="Videos" />
+                      <NavItem href="/blogs" title="Blogs" />
+                      <NavItem href="/events" title="Events" />
                     </ul>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
