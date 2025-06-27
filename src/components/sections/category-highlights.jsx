@@ -183,7 +183,7 @@ export default function CategoryHighlights() {
             <motion.a
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              href="https://wa.me/yourNumber" // replace with your number
+              href="https://whatsapp.com/channel/0029VaAMqSs545uqemVLkC0a" // replace with your number
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-green-700 text-white dark:text-white rounded-full font-medium hover:shadow-lg transition-all duration-300"

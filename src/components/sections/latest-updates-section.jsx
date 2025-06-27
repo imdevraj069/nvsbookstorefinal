@@ -49,7 +49,7 @@ export default function LatestUpdatesSection() {
     {
       title: "Latest Jobs",
       notifications: latestJobs,
-      href: "/jobs",
+      href: "/notifications/jobs",
       gradient: "from-red-500 to-orange-600",
       bgGradient:
         "from-red-50 to-orange-50 dark:from-red-950 dark:to-orange-950",
@@ -58,7 +58,7 @@ export default function LatestUpdatesSection() {
     {
       title: "Latest Results",
       notifications: latestResults,
-      href: "/results",
+      href: "/notifications/results",
       gradient: "from-green-500 to-emerald-600",
       bgGradient:
         "from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950",
@@ -67,7 +67,7 @@ export default function LatestUpdatesSection() {
     {
       title: "Admit Cards",
       notifications: latestAdmitCards,
-      href: "/admit-cards",
+      href: "/notifications/admit-cards",
       gradient: "from-blue-500 to-cyan-600",
       bgGradient: "from-blue-50 to-cyan-50 dark:from-blue-950 dark:to-cyan-950",
       icon: "📋",
