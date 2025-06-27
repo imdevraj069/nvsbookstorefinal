@@ -1,72 +1,73 @@
 // app/components/admin/OrdersAdmin.js
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import axios from "axios"
+import { useEffect, useState } from "react";
+import axios from "axios";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectTrigger,
   SelectValue,
   SelectContent,
   SelectItem,
-} from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Eye } from "lucide-react"
-import toast from "react-hot-toast"
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Eye, Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function OrdersAdmin() {
-  const [orders, setOrders] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [selectedOrder, setSelectedOrder] = useState(null)
-  const [statusToUpdate, setStatusToUpdate] = useState(null)
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [statusToUpdate, setStatusToUpdate] = useState(null);
 
   useEffect(() => {
-    fetchOrders()
-  }, [])
+    fetchOrders();
+  }, []);
 
   const fetchOrders = async () => {
     try {
-      setLoading(true)
-      const res = await axios.get("/api/admin/orders")
-      setOrders(res.data.data)
+      setLoading(true);
+      const res = await axios.get("/api/admin/orders");
+      setOrders(res.data.data);
     } catch (err) {
-      toast.error("Failed to load orders")
+      toast.error("Failed to load orders");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleStatusSelect = (order, newStatus) => {
-    if (order.status === newStatus) return
-    setSelectedOrder(order)
-    setStatusToUpdate(newStatus)
-  }
+    if (order.status === newStatus) return;
+    setSelectedOrder(order);
+    setStatusToUpdate(newStatus);
+  };
 
   const confirmStatusChange = async () => {
     try {
+      setLoading(true);
       await axios.put(`/api/admin/orders/${selectedOrder._id}`, {
         status: statusToUpdate,
-      })
-      toast.success("Status updated")
+      });
+      toast.success("Status updated");
       setOrders((prev) =>
         prev.map((o) =>
           o._id === selectedOrder._id ? { ...o, status: statusToUpdate } : o
         )
-      )
+      );
     } catch (err) {
-      toast.error("Failed to update status")
+      toast.error("Failed to update status");
     } finally {
-      setSelectedOrder(null)
-      setStatusToUpdate(null)
+      setSelectedOrder(null);
+      setStatusToUpdate(null);
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -90,7 +91,9 @@ export default function OrdersAdmin() {
             <tbody>
               {orders.map((order) => (
                 <tr key={order._id} className="border-b">
-                  <td className="p-4 max-w-xs truncate">{order.customerName}</td>
+                  <td className="p-4 max-w-xs truncate">
+                    {order.customerName}
+                  </td>
                   <td className="p-4">{order.customerEmail}</td>
                   <td className="p-4">
                     <Select
@@ -98,24 +101,32 @@ export default function OrdersAdmin() {
                       onValueChange={(newStatus) =>
                         handleStatusSelect(order, newStatus)
                       }
-                      disabled={["delivered", "cancelled"].includes(order.status)}
+                      disabled={["delivered", "cancelled"].includes(
+                        order.status
+                      )}
                     >
                       <SelectTrigger className="w-[130px]">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {["pending", "processing", "shipped", "delivered", "cancelled"].map(
-                          (status) => (
-                            <SelectItem key={status} value={status}>
-                              {status}
-                            </SelectItem>
-                          )
-                        )}
+                        {[
+                          "pending",
+                          "processing",
+                          "shipped",
+                          "delivered",
+                          "cancelled",
+                        ].map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {status}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </td>
                   <td className="p-4">₹{order.price.total}</td>
-                  <td className="p-4">{new Date(order.createdAt).toLocaleDateString()}</td>
+                  <td className="p-4">
+                    {new Date(order.createdAt).toLocaleDateString()}
+                  </td>
                   <td className="p-4">
                     <Button
                       size="sm"
@@ -140,7 +151,9 @@ export default function OrdersAdmin() {
             </DialogHeader>
             <div className="space-y-4">
               <div>
-                <p className="text-sm">Customer: {selectedOrder.customerName}</p>
+                <p className="text-sm">
+                  Customer: {selectedOrder.customerName}
+                </p>
                 <p className="text-sm">Email: {selectedOrder.customerEmail}</p>
                 <p className="text-sm">Phone: {selectedOrder.customerPhone}</p>
               </div>
@@ -172,20 +185,30 @@ export default function OrdersAdmin() {
             </DialogHeader>
             <div className="space-y-4">
               <p>
-                Are you sure you want to change the status of order <b>#{selectedOrder._id.slice(-5)}</b> to {" "}
-                {statusToUpdate}
-                ?
+                Are you sure you want to change the status of order{" "}
+                <b>#{selectedOrder._id.slice(-5)}</b> to {statusToUpdate}?
               </p>
               <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setSelectedOrder(null)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setSelectedOrder(null)}
+                >
                   Cancel
                 </Button>
-                <Button onClick={confirmStatusChange}>Confirm</Button>
+
+                {loading ? (
+                  <Button disabled className="flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Updating...
+                  </Button>
+                ) : (
+                  <Button onClick={confirmStatusChange}>Confirm</Button>
+                )}
               </div>
             </div>
           </DialogContent>
         </Dialog>
       )}
     </div>
-  )
+  );
 }

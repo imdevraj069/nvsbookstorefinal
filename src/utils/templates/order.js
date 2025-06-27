@@ -1,26 +1,49 @@
 import { emailSignature } from "./shared";
 
 export const renderUserOrderConfirmationEmail = (order) => {
-  const getDownloadLink = (url, title) => {
-    const safeTitle = title.trim().replace(/\s+/g, "_");
-    return url.replace("/upload/", `/upload/fl_attachment:${safeTitle}.pdf/`);
-  };
+  const digitalItems = order.items.filter((item) => item.product.isDigital);
+  const physicalItems = order.items.filter((item) => !item.product.isDigital);
 
-  const digitalDownloads = order.items
-    .filter((item) => item.product.isDigital)
-    .map(
-      (item) => `
-        <p style="margin:8px 0;">
-          📥 <a href="${getDownloadLink(
-            item.product.digitalUrl,
-            item.product.title
-          )}" style="color:#2563eb;text-decoration:underline;">
-            Download ${item.product.title}
+  const renderItemsTable = (items) => `
+    <table style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr style="background:#f0f0f0;text-align:left;">
+          <th style="padding:10px;font-size:14px;">Product</th>
+          <th style="padding:10px;font-size:14px;">Quantity</th>
+          <th style="padding:10px;font-size:14px;">Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${items
+          .map(
+            (item) => `
+          <tr>
+            <td style="padding:10px;border-bottom:1px solid #eee;">${item.product.title}</td>
+            <td style="padding:10px;border-bottom:1px solid #eee;">${item.quantity}</td>
+            <td style="padding:10px;border-bottom:1px solid #eee;">₹${item.product.price.toFixed(2)}</td>
+          </tr>
+        `
+          )
+          .join("")}
+      </tbody>
+    </table>
+  `;
+
+  const renderDigitalDownloads = () =>
+    digitalItems
+      .map(
+        (item) => `
+        <div style="margin-bottom:12px;padding:12px;border:1px solid #eee;border-radius:6px;">
+          <p style="margin:0 0 6px;"><strong>${item.product.title}</strong></p>
+          <a href="${item.product.digitalUrl}" 
+             style="display:inline-block;padding:10px 16px;background:#2563eb;color:#fff;text-decoration:none;border-radius:4px;font-weight:500;"
+             download>
+            📄 Download PDF
           </a>
-        </p>
+        </div>
       `
-    )
-    .join("");
+      )
+      .join("");
 
   return `
   <html>
@@ -39,7 +62,6 @@ export const renderUserOrderConfirmationEmail = (order) => {
           <p><strong>Order ID:</strong> ${order._id}</p>
           <p><strong>Payment Status:</strong> ${order.paymentStatus}</p>
           <p><strong>Placed On:</strong> ${new Date(order.createdAt).toLocaleDateString()}</p>
-          <p><strong>Total Amount:</strong> ₹${order.price.total.toFixed(2)}</p>
         </div>
 
         <!-- Shipping Info -->
@@ -53,44 +75,30 @@ export const renderUserOrderConfirmationEmail = (order) => {
           </p>
         </div>
 
-        <!-- Ordered Items -->
+        <!-- Product Items -->
         <div style="padding:0 24px 24px 24px;">
           <h2 style="font-size:18px;margin-bottom:12px;">🛍️ Items Ordered</h2>
-          <table style="width:100%;border-collapse:collapse;">
-            <thead>
-              <tr style="background:#f0f0f0;text-align:left;">
-                <th style="padding:10px;font-size:14px;">Product</th>
-                <th style="padding:10px;font-size:14px;">Quantity</th>
-                <th style="padding:10px;font-size:14px;">Price</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${order.items
-                .map(
-                  (item) => `
-                  <tr>
-                    <td style="padding:10px;border-bottom:1px solid #eee;">${item.product.title}</td>
-                    <td style="padding:10px;border-bottom:1px solid #eee;">${item.quantity}</td>
-                    <td style="padding:10px;border-bottom:1px solid #eee;">₹${item.product.price.toFixed(2)}</td>
-                  </tr>
-                `
-                )
-                .join("")}
-            </tbody>
-          </table>
+          ${renderItemsTable(order.items)}
         </div>
 
-        <!-- Digital Downloads -->
+        <!-- Digital Downloads Section -->
         ${
-          digitalDownloads
+          digitalItems.length
             ? `
-          <div style="padding:0 24px 24px 24px;">
-            <h2 style="font-size:18px;margin-bottom:12px;">📄 Digital Downloads</h2>
-            ${digitalDownloads}
-          </div>
-          `
+        <div style="padding:0 24px 24px 24px;">
+          <h2 style="font-size:18px;margin-bottom:12px;">📄 Digital Products</h2>
+          ${renderDigitalDownloads()}
+        </div>
+        `
             : ""
         }
+
+        <!-- Final Total -->
+        <div style="padding:0 24px 24px 24px;">
+          <h3 style="font-size:16px;margin-top:24px;border-top:1px solid #eee;padding-top:16px;">
+            💰 Total Amount Paid: ₹${order.price.total.toFixed(2)}
+          </h3>
+        </div>
 
         <!-- Footer -->
         <div style="padding:24px;text-align:center;font-size:14px;color:#888;border-top:1px solid #eee">
@@ -98,7 +106,6 @@ export const renderUserOrderConfirmationEmail = (order) => {
           <p style="margin:4px 0 12px;">Thank you for shopping with <strong>BlackBird Bookstore</strong> 🖤</p>
           ${emailSignature}
         </div>
-
       </div>
     </body>
   </html>
@@ -106,26 +113,49 @@ export const renderUserOrderConfirmationEmail = (order) => {
 };
 
 
+
 export const renderAdminOrderNotificationEmail = (order) => `
   <html>
     <body style="margin:0;padding:0;background-color:#f4f4f4;font-family:'Segoe UI',sans-serif;">
       <div style="max-width:600px;margin:0 auto;padding:40px 20px;background:#ffffff;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.05);">
-        <div style="background:#dc2626;color:white;padding:24px;text-align:center;border-radius:8px 8px 0 0">
-          <h1 style="margin:0">📦 New Order Received</h1>
-          <p style="margin:8px 0">From ${order.customerName}</p>
+        
+        <!-- Header -->
+        <div style="background:#dc2626;color:white;padding:24px;text-align:center;border-radius:8px 8px 0 0;">
+          <h1 style="margin:0;font-size:24px;">📦 New Order Received</h1>
+          <p style="margin:8px 0;font-size:16px;">From ${order.customerName}</p>
         </div>
 
-        <div style="padding:24px">
+        <!-- Details -->
+        <div style="padding:24px;">
           <p><strong>Email:</strong> ${order.customerEmail}</p>
           <p><strong>Phone:</strong> ${order.customerPhone}</p>
-          <p><strong>Payment:</strong> ${order.paymentMethod}</p>
-          <p><strong>Total:</strong> ₹${order.price.total}</p>
-          <h3 style="margin-top:20px;">🛍️ Items</h3>
-          <ul>
-            ${order.items.map(item => `<li>${item.product.title} x ${item.quantity}</li>`).join("")}
-          </ul>
+          <p><strong>Payment Method:</strong> ${order.paymentMethod}</p>
+          <p><strong>Total Amount:</strong> ₹${order.price.total.toFixed(2)}</p>
+
+          <h3 style="margin-top:24px;font-size:18px;">🛍️ Items</h3>
+          <table style="width:100%;border-collapse:collapse;margin-top:8px;">
+            <thead>
+              <tr style="background:#f0f0f0;text-align:left;">
+                <th style="padding:10px;font-size:14px;">Product</th>
+                <th style="padding:10px;font-size:14px;">Quantity</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${order.items
+                .map(
+                  (item) => `
+                <tr>
+                  <td style="padding:10px;border-bottom:1px solid #eee;">${item.product.title}</td>
+                  <td style="padding:10px;border-bottom:1px solid #eee;">${item.quantity}</td>
+                </tr>
+              `
+                )
+                .join("")}
+            </tbody>
+          </table>
         </div>
 
+        <!-- Footer -->
         <div style="padding:24px;text-align:center;font-size:14px;color:#888;border-top:1px solid #eee">
           ${emailSignature}
         </div>
@@ -134,20 +164,27 @@ export const renderAdminOrderNotificationEmail = (order) => `
   </html>
 `;
 
+
 export const renderUserOrderStatusUpdateEmail = (order) => `
   <html>
     <body style="margin:0;padding:0;background-color:#f4f4f4;font-family:'Segoe UI',sans-serif;">
       <div style="max-width:600px;margin:0 auto;padding:40px 20px;background:#ffffff;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.05);">
-        <div style="background:#10b981;color:white;padding:24px;text-align:center;border-radius:8px 8px 0 0">
-          <h1 style="margin:0">📢 Order Status Update</h1>
+        
+        <!-- Header -->
+        <div style="background:#10b981;color:white;padding:24px;text-align:center;border-radius:8px 8px 0 0;">
+          <h1 style="margin:0;font-size:24px;">📢 Order Status Update</h1>
         </div>
 
-        <div style="padding:24px">
-          <p>Hi ${order.customerName},</p>
-          <p>Your order <strong>#${order._id}</strong> status has been updated to:</p>
-          <p style="font-size:18px"><strong>${order.status.toUpperCase()}</strong></p>
+        <!-- Body -->
+        <div style="padding:24px;">
+          <p style="font-size:16px;">Hi ${order.customerName},</p>
+          <p style="font-size:16px;">Your order <strong>#${order._id}</strong> status has been updated to:</p>
+          <div style="margin-top:12px;padding:12px;background-color:#f0fdf4;border-left:4px solid #10b981;border-radius:4px;">
+            <strong style="font-size:18px;color:#065f46;">${order.status.toUpperCase()}</strong>
+          </div>
         </div>
 
+        <!-- Footer -->
         <div style="padding:24px;text-align:center;font-size:14px;color:#888;border-top:1px solid #eee">
           ${emailSignature}
         </div>

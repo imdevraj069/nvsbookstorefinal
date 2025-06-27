@@ -22,7 +22,7 @@ export async function uploadToCloudinary(file) {
     resource_type = "image";
   } else if (mimeType === "application/pdf") {
     folder = "products/pdfs";
-    resource_type = "raw"; // PDF is treated as "raw" by Cloudinary
+    resource_type = "image"; // PDF is treated as "image" by Cloudinary
   }
 
   return new Promise((resolve, reject) => {
