@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   images: {
     domains: ['res.cloudinary.com', 'picsum.photos'],
   },
+  reactStrictMode: false,
 };
 
 export default nextConfig;
