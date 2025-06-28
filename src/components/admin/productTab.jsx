@@ -127,30 +127,30 @@ export default function ProductTab() {
   };
 
   async function toggleField(id, field) {
-  try {
-    const response = await axios.patch("/api/product/", {
-      id,
-      field
-    });
+    try {
+      const response = await axios.patch("/api/product/", {
+        id,
+        field
+      });
 
-    if (response.data.success) {
-      const updated = response.data.data
-      toast.success("✅ Toggled:", field);
-      setProducts((prev) =>
-        prev.map((product) =>
-          product._id === id ? { ...product, [field]: updated[field] } : product
-        )
-      );
-    } else {
-      toast.error("⚠️ Toggle failed:", response.data.message);
+      if (response.data.success) {
+        const updated = response.data.data
+        toast.success("✅ Toggled:", field);
+        setProducts((prev) =>
+          prev.map((product) =>
+            product._id === id ? { ...product, [field]: updated[field] } : product
+          )
+        );
+      } else {
+        toast.error("⚠️ Toggle failed:", response.data.message);
+      }
+
+      return response.data;
+    } catch (err) {
+      toast.error("❌ API error:", err);
+      return { success: false, message: "Request failed" };
     }
-
-    return response.data;
-  } catch (err) {
-    toast.error("❌ API error:", err);
-    return { success: false, message: "Request failed" };
   }
-}
 
   return (
     <div className="space-y-6">

@@ -47,6 +47,8 @@ export default function NotificationsTab() {
       applyUrl: notification.applyUrl,
       websiteUrl: notification.websiteUrl,
       date: notification.date?.slice(0, 10),
+      isVisible: notification.isVisible,
+      isfeatured: notification.isfeatured,
       lastDate: notification.lastDate?.slice(0, 10),
       ...notification
     });
@@ -117,6 +119,32 @@ export default function NotificationsTab() {
     setFormData({});
   };
 
+  async function toggleField(id, field) {
+    try {
+      const response = await axios.patch("/api/notofication/", {
+        id,
+        field
+      });
+
+      if (response.data.success) {
+        const updated = response.data.data
+        toast.success("✅ Toggled:", field);
+        setNotifications((prev) =>
+          prev.map((notification) =>
+            notification._id === id ? { ...notification, [field]: updated[field] } : notification
+          )
+        );
+      } else {
+        toast.error("⚠️ Toggle failed:", response.data.message);
+      }
+
+      return response.data;
+    } catch (err) {
+      toast.error("❌ API error:", err);
+      return { success: false, message: "Request failed" };
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="bg-card border border-border rounded-lg overflow-hidden">
@@ -142,6 +170,7 @@ export default function NotificationsTab() {
                 <th className="text-left p-3 sm:p-4">Category</th>
                 <th className="text-left p-3 sm:p-4">Department</th>
                 <th className="text-left p-3 sm:p-4">Date</th>
+                <th className="text-left p-3 sm:p-4">Status</th>
                 <th className="text-left p-3 sm:p-4">Actions</th>
               </tr>
             </thead>
@@ -161,6 +190,21 @@ export default function NotificationsTab() {
                   </td>
                   <td className="p-3 sm:p-4 whitespace-nowrap">
                     {new Date(notification.date).toLocaleDateString()}
+                  </td>
+                  <td className="p-3 sm:p-4">
+                    <div className="flex flex-col gap-1">
+                      <Badge 
+                        variant={notification.isVisible ? "default" : "secondary"}
+                        className="text-xs w-fit"
+                      >
+                        {notification.isVisible ? "Visible" : "Hidden"}
+                      </Badge>
+                      {notification.isfeatured && (
+                        <Badge variant="outline" className="text-xs w-fit">
+                          Featured
+                        </Badge>
+                      )}
+                    </div>
                   </td>
                   <td className="p-3 sm:p-4">
                     <div className="flex gap-2">
