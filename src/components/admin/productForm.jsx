@@ -10,12 +10,12 @@ import { Textarea } from "@/components/ui/textarea";
 import toast from "react-hot-toast";
 import Image from "next/image";
 
-export default function ProductForm({ 
-  isOpen, 
-  onClose, 
-  onSubmit, 
-  editMode = false, 
-  initialData = null 
+export default function ProductForm({
+  isOpen,
+  onClose,
+  onSubmit,
+  editMode = false,
+  initialData = null,
 }) {
   // State
   const [productCategories, setProductCategories] = useState([]);
@@ -24,6 +24,8 @@ export default function ProductForm({
   const [newSpecKey, setNewSpecKey] = useState("");
   const [newSpecValue, setNewSpecValue] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [digitalInputMode, setDigitalInputMode] = useState("upload"); // 'upload' | 'url'
+
 
   // Form data structure
   const defaultFormData = {
@@ -169,7 +171,6 @@ export default function ProductForm({
       setUploading(false);
     }
   };
-
 
   const handleAddCategory = async () => {
     if (!newProductCategory.trim()) return;
@@ -348,11 +349,7 @@ export default function ProductForm({
 
           <div>
             <Label htmlFor="isbn">ISBN</Label>
-            <Input
-              id="isbn"
-              onChange={handleChange}
-              value={formData.isbn}
-            />
+            <Input id="isbn" onChange={handleChange} value={formData.isbn} />
           </div>
 
           <div>
@@ -362,7 +359,9 @@ export default function ProductForm({
               onChange={(e) =>
                 setFormData((prev) => ({
                   ...prev,
-                  language: e.target.value.split(",").map((lang) => lang.trim()),
+                  language: e.target.value
+                    .split(",")
+                    .map((lang) => lang.trim()),
                 }))
               }
               value={formData.language?.join(", ") || ""}
@@ -378,9 +377,7 @@ export default function ProductForm({
               onChange={(e) => handleFileUpload(e, "image")}
               disabled={uploading}
             />
-            {uploading && (
-              <p className="text-muted-foreground">Uploading...</p>
-            )}
+            {uploading && <p className="text-muted-foreground">Uploading...</p>}
             {formData.image && (
               <Image
                 src={formData.image}
@@ -390,27 +387,6 @@ export default function ProductForm({
                 sizes="100vw"
                 className="mt-2 h-[120px] w-auto object-contain"
               />
-            )}
-          </div>
-
-          {/* Digital Product PDF Upload */}
-          <div>
-            <Label>Upload Digital PDF (if digital)</Label>
-            <Input
-              type="file"
-              accept="application/pdf"
-              onChange={(e) => handleFileUpload(e, "pdf")}
-              disabled={uploading}
-            />
-            {formData.digitalUrl && (
-              <a
-                href={formData.digitalUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="text-sm text-blue-500 underline mt-1 block"
-              >
-                View PDF
-              </a>
             )}
           </div>
 
@@ -457,6 +433,87 @@ export default function ProductForm({
             </label>
           </div>
 
+          {/* Digital Product PDF Upload */}
+          {formData.isDigital && (
+            <div className="space-y-2">
+              {/* Local UI state for toggle */}
+              <div className="flex border border-input rounded-md overflow-hidden w-fit mb-2">
+                <button
+                  type="button"
+                  className={`px-4 py-2 text-sm font-medium ${
+                    digitalInputMode === "upload"
+                      ? "bg-muted text-foreground"
+                      : "text-muted-foreground"
+                  }`}
+                  onClick={() => {
+                    setDigitalInputMode("upload");
+                    setFormData((prev) => ({ ...prev, digitalUrl: "" }));
+                  }}
+                >
+                  Upload File
+                </button>
+                <button
+                  type="button"
+                  className={`px-4 py-2 text-sm font-medium ${
+                    digitalInputMode === "url"
+                      ? "bg-muted text-foreground"
+                      : "text-muted-foreground"
+                  }`}
+                  onClick={() => {
+                    setDigitalInputMode("url");
+                    setFormData((prev) => ({ ...prev, digitalUrl: "" }));
+                  }}
+                >
+                  Use URL
+                </button>
+              </div>
+
+              {digitalInputMode === "upload" && (
+                <div>
+                  <Label>Upload Digital PDF</Label>
+                  <Input
+                    type="file"
+                    accept="application/pdf"
+                    onChange={(e) => handleFileUpload(e, "pdf")}
+                    disabled={uploading}
+                  />
+                  {uploading && (
+                    <p className="text-sm text-muted-foreground">
+                      Uploading...
+                    </p>
+                  )}
+                  {formData.digitalUrl && (
+                    <a
+                      href={formData.digitalUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-sm text-blue-500 underline mt-1 block"
+                    >
+                      View Uploaded File
+                    </a>
+                  )}
+                </div>
+              )}
+
+              {digitalInputMode === "url" && (
+                <div>
+                  <Label htmlFor="digitalUrl">Direct Download URL</Label>
+                  <Input
+                    id="digitalUrl"
+                    placeholder="https://example.com/file.pdf"
+                    value={formData.digitalUrl || ""}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        digitalUrl: e.target.value.trim(),
+                      }))
+                    }
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Specifications */}
           <div>
             <Label>Specifications</Label>
@@ -478,7 +535,10 @@ export default function ProductForm({
             <div className="space-y-2">
               {Object.entries(formData.specifications || {}).map(
                 ([key, value]) => (
-                  <div key={key} className="flex items-center justify-between p-2 bg-muted rounded">
+                  <div
+                    key={key}
+                    className="flex items-center justify-between p-2 bg-muted rounded"
+                  >
                     <span className="text-sm">
                       <strong>{key}:</strong> {value}
                     </span>
