@@ -24,7 +24,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <meta name="google-site-verification" content="0erX1NW53cNQgT0kn2oErK6NJzbPd3fEMbmRSM-Gg1Q" />
+        <meta name="google-site-verification" content="58kmXpJs2zFCjH4QktlPy8X0-Mev-zeZfigGGDDCluY" />
       </head>
       <body className={`${inter.className} pt-16`}>
         <ThemeProvider
