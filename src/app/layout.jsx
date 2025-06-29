@@ -23,6 +23,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <meta name="google-site-verification" content="0erX1NW53cNQgT0kn2oErK6NJzbPd3fEMbmRSM-Gg1Q" />
+      </head>
       <body className={`${inter.className} pt-16`}>
         <ThemeProvider
           attribute="class"
