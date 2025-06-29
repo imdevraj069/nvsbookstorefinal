@@ -16,6 +16,8 @@ export const metadata = {
   icons: {
     icon: "/favicon.ico", // path relative to public/
   },
+  name:"google-site-verification",
+  content:"0erX1NW53cNQgT0kn2oErK6NJzbPd3fEMbmRSM-Gg1Q"
 };
 
 export default function RootLayout({ children }) {
