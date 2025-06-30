@@ -34,6 +34,9 @@ export default function NotificationForm({
     pdfUrl: "",
     applyUrl: "",
     websiteUrl: "",
+    loginUrl: "", // ✅ Add this
+    resultUrl: "", // ✅ Add this
+    admitCardUrl: "", // ✅ Add this
     lastDate: "",
     date: "",
     isVisible: true,
@@ -56,13 +59,18 @@ export default function NotificationForm({
 
   const handleChange = (e) => {
     const { id, value, type, checked } = e.target;
-    setForm((prev) => ({ ...prev, [id]: type === "checkbox" ? checked : value }));
+    setForm((prev) => ({
+      ...prev,
+      [id]: type === "checkbox" ? checked : value,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const selectedCategory = categories.find((cat) => cat._id === form.category);
+    const selectedCategory = categories.find(
+      (cat) => cat._id === form.category
+    );
     const dataToSend = { ...form, category: selectedCategory };
 
     try {
@@ -70,7 +78,9 @@ export default function NotificationForm({
         ? await axios.put(`/api/notification/${currentEditId}`, dataToSend)
         : await axios.post("/api/notification", { data: dataToSend });
 
-      toast.success(`Notification ${editMode ? "updated" : "created"} successfully`);
+      toast.success(
+        `Notification ${editMode ? "updated" : "created"} successfully`
+      );
       onSuccess(res.data.data, editMode);
     } catch (error) {
       console.error("Error submitting notification:", error);
@@ -107,10 +117,22 @@ export default function NotificationForm({
         return (
           <>
             <Label htmlFor="title">Title</Label>
-            <Input id="title" required onChange={handleChange} value={form.title} disabled={loading} />
+            <Input
+              id="title"
+              required
+              onChange={handleChange}
+              value={form.title}
+              disabled={loading}
+            />
 
             <Label htmlFor="description">Description</Label>
-            <Input id="description" required onChange={handleChange} value={form.description} disabled={loading} />
+            <Input
+              id="description"
+              required
+              onChange={handleChange}
+              value={form.description}
+              disabled={loading}
+            />
           </>
         );
       case 1:
@@ -151,20 +173,38 @@ export default function NotificationForm({
                   onChange={(e) => setNewCategory(e.target.value)}
                   disabled={loading}
                 />
-                <Button type="button" onClick={handleAddCategory} disabled={categoryLoading}>
+                <Button
+                  type="button"
+                  onClick={handleAddCategory}
+                  disabled={categoryLoading}
+                >
                   {categoryLoading ? "Adding..." : "Add"}
                 </Button>
-                <Button type="button" variant="outline" onClick={() => setAddCategoryMode(false)}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setAddCategoryMode(false)}
+                >
                   Cancel
                 </Button>
               </div>
             )}
 
             <Label htmlFor="department">Department</Label>
-            <Input id="department" onChange={handleChange} value={form.department} disabled={loading} />
+            <Input
+              id="department"
+              onChange={handleChange}
+              value={form.department}
+              disabled={loading}
+            />
 
             <Label htmlFor="location">Location</Label>
-            <Input id="location" onChange={handleChange} value={form.location} disabled={loading} />
+            <Input
+              id="location"
+              onChange={handleChange}
+              value={form.location}
+              disabled={loading}
+            />
           </>
         );
       case 2:
@@ -172,7 +212,9 @@ export default function NotificationForm({
           <>
             <RichEditor
               content={form.content}
-              onChange={(html) => setForm((prev) => ({ ...prev, content: html }))}
+              onChange={(html) =>
+                setForm((prev) => ({ ...prev, content: html }))
+              }
             />
           </>
         );
@@ -180,23 +222,78 @@ export default function NotificationForm({
         return (
           <>
             <Label htmlFor="pdfUrl">PDF URL</Label>
-            <Input id="pdfUrl" onChange={handleChange} value={form.pdfUrl} disabled={loading} />
+            <Input
+              id="pdfUrl"
+              onChange={handleChange}
+              value={form.pdfUrl}
+              disabled={loading}
+            />
 
             <Label htmlFor="applyUrl">Apply URL</Label>
-            <Input id="applyUrl" onChange={handleChange} value={form.applyUrl} disabled={loading} />
+            <Input
+              id="applyUrl"
+              onChange={handleChange}
+              value={form.applyUrl}
+              disabled={loading}
+            />
 
             <Label htmlFor="websiteUrl">Website URL</Label>
-            <Input id="websiteUrl" onChange={handleChange} value={form.websiteUrl} disabled={loading} />
+            <Input
+              id="websiteUrl"
+              onChange={handleChange}
+              value={form.websiteUrl}
+              disabled={loading}
+            />
+
+            <Label htmlFor="loginUrl">Login URL</Label>
+            <Input
+              id="loginUrl"
+              placeholder="Enter Login URL"
+              value={form.loginUrl || ""}
+              onChange={handleChange}
+              disabled={loading}
+            />
+
+            <Label htmlFor="resultUrl">Result URL</Label>
+            <Input
+              id="resultUrl"
+              placeholder="Enter Result URL"
+              value={form.resultUrl || ""}
+              onChange={handleChange}
+              disabled={loading}
+            />
+
+            <Label htmlFor="admitCardUrl">Admit Card URL</Label>
+            <Input
+              id="admitCardUrl"
+              placeholder="Enter Admit Card URL"
+              value={form.admitCardUrl || ""}
+              onChange={handleChange}
+              disabled={loading}
+            />
           </>
         );
+
       case 4:
         return (
           <>
             <Label htmlFor="date">Date</Label>
-            <Input id="date" type="date" onChange={handleChange} value={form.date} disabled={loading} />
+            <Input
+              id="date"
+              type="date"
+              onChange={handleChange}
+              value={form.date}
+              disabled={loading}
+            />
 
             <Label htmlFor="lastDate">Last Date</Label>
-            <Input id="lastDate" type="date" onChange={handleChange} value={form.lastDate} disabled={loading} />
+            <Input
+              id="lastDate"
+              type="date"
+              onChange={handleChange}
+              value={form.lastDate}
+              disabled={loading}
+            />
           </>
         );
       case 5:
@@ -238,7 +335,9 @@ export default function NotificationForm({
             key={tab}
             onClick={() => setActiveTab(index)}
             className={`text-left px-4 py-2 rounded-md transition ${
-              activeTab === index ? "bg-blue-100 font-semibold" : "hover:bg-gray-200"
+              activeTab === index
+                ? "bg-blue-100 font-semibold"
+                : "hover:bg-gray-200"
             }`}
             disabled={loading || categoryLoading}
           >
@@ -253,7 +352,12 @@ export default function NotificationForm({
             {editMode ? "Edit Notification" : "New Notification"}
           </h2>
           <div className="flex gap-2">
-            <Button type="button" variant="outline" onClick={onCancel} disabled={loading}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              disabled={loading}
+            >
               Cancel
             </Button>
             <Button type="submit" form="notification-form" disabled={loading}>
@@ -262,7 +366,11 @@ export default function NotificationForm({
           </div>
         </div>
 
-        <form id="notification-form" onSubmit={handleSubmit} className="space-y-4">
+        <form
+          id="notification-form"
+          onSubmit={handleSubmit}
+          className="space-y-4"
+        >
           {renderTabContent()}
         </form>
 
@@ -277,7 +385,9 @@ export default function NotificationForm({
           </Button>
           <Button
             type="button"
-            onClick={() => setActiveTab((prev) => Math.min(prev + 1, tabs.length - 1))}
+            onClick={() =>
+              setActiveTab((prev) => Math.min(prev + 1, tabs.length - 1))
+            }
             disabled={activeTab === tabs.length - 1 || loading}
           >
             Next

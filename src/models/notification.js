@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { title } from "process";
 
 const notificationCategorySchema = new mongoose.Schema({
   name: {
@@ -9,75 +8,91 @@ const notificationCategorySchema = new mongoose.Schema({
   },
   description: {
     type: String,
-    default:""
+    default: "",
   },
-  slug:{
-    type:String,
-    default:""
-  }
-})
+  slug: {
+    type: String,
+    default: "",
+  },
+});
 
 const notificationSchema = new mongoose.Schema({
-  title:{
-    type:String,
-    required:true
+  title: {
+    type: String,
+    required: true,
   },
-  description:{
-    type:String,
-    required:true,
-    default:""
+  description: {
+    type: String,
+    required: true,
+    default: "",
   },
-  content:{
-    type:String,
-    default:""
+  content: {
+    type: String,
+    default: "",
   },
-  category:{
-    type:notificationCategorySchema,
-    required:true,
+  category: {
+    type: notificationCategorySchema,
+    required: true,
   },
-  date:{
-    type:Date,
-    default:Date.now
+  date: {
+    type: Date,
+    default: Date.now,
   },
-  department:{
-    type:String,
-    default:""
+  department: {
+    type: String,
+    default: "",
   },
-  location:{
-    type:String,
-    default:""
+  location: {
+    type: String,
+    default: "",
   },
-  pdfUrl:{
-    type:String,
-    default:""
+  pdfUrl: {
+    type: String,
+    default: "",
   },
-  applyUrl:{
-    type:String,
-    default:""
+  applyUrl: {
+    type: String,
+    default: "",
   },
-  websiteUrl:{
-    type:String,
-    default:""
+  websiteUrl: {
+    type: String,
+    default: "",
   },
-  lastDate:{
-    type:Date,
-    default:Date.now
+
+  // ✅ Newly added fields
+  loginUrl: {
+    type: String,
+    default: "",
+  },
+  resultUrl: {
+    type: String,
+    default: "",
+  },
+  admitCardUrl: {
+    type: String,
+    default: "",
+  },
+
+  lastDate: {
+    type: Date,
+    default: Date.now,
   },
   isVisible: {
     type: Boolean,
-    default: true
+    default: true,
   },
-  isfeatured:{
-    type:Boolean,
-    default:false
-  }
+  isfeatured: {
+    type: Boolean,
+    default: false,
+  },
+});
 
-})
-
-const NotificationCategory = 
-    mongoose.models?.NotificationCategory || mongoose.model("NotificationCategory", notificationCategorySchema);
+const NotificationCategory =
+  mongoose.models?.NotificationCategory ||
+  mongoose.model("NotificationCategory", notificationCategorySchema);
 
 const Notification =
-    mongoose.models?.Notification || mongoose.model("Notification", notificationSchema);
+  mongoose.models?.Notification ||
+  mongoose.model("Notification", notificationSchema);
 
-export {Notification, NotificationCategory};
+export { Notification, NotificationCategory };
