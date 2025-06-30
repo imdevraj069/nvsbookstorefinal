@@ -148,7 +148,7 @@ export default function CategoryHighlights() {
             >
               <Link href={category.href} className="block group">
                 <div
-                  className={`relative overflow-hidden rounded-xl h-full sm:rounded-2xl p-4 sm:p-6
+                  className={`relative overflow-hidden rounded-xl h-full sm:rounded-2xl p-4 lg:p-6
                   
                     border border-white/20 dark:border-slate-700/50 backdrop-blur-sm transition-all duration-300 hover:shadow-2xl hover:shadow-slate-200/50 dark:hover:shadow-slate-900/50`}
                 >
@@ -161,14 +161,14 @@ export default function CategoryHighlights() {
                   <div className="relative z-10 flex flex-col items-center h-full min-h-[6rem]">
                     {/* Icon */}
                     <motion.div
-                      className={`${category.iconBg} p-2 sm:p-4 rounded-2xl w-10 h-10 lg:w-16 lg:h-16 flex items-center justify-center mb-6 shadow-lg`}
+                      className={`${category.iconBg} p-2 lg:p-4 rounded-2xl w-10 h-10 lg:w-16 lg:h-16 flex items-center justify-center mb-6 shadow-lg`}
                       whileHover={{
                         rotate: [0, -10, 10, -5, 0],
                         scale: 1.1,
                       }}
                       transition={{ duration: 0.5 }}
                     >
-                      <category.icon className="w-4 h-4 lg:w-8 lg:h-8 text-white" />
+                      <category.icon className="w-4 h-4 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-white" />
                     </motion.div>
                     {/* Title */}
                     <h3 className="text-xs text-center sm:text-xl font-bold mb-3 text-slate-900 dark:text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:bg-clip-text group-hover:from-slate-900 group-hover:to-slate-600 dark:group-hover:from-white dark:group-hover:to-slate-300 transition-all duration-300">
@@ -189,7 +189,7 @@ export default function CategoryHighlights() {
 
         {/* Bottom CTA */}
         <motion.div
-          className="text-center mt-6 sm:mt-8"
+          className="text-center mt-4 sm:mt-6"
           initial={{ y: 30, opacity: 0 }}
           whileInView={{ y: 0, opacity: 1 }}
           viewport={{ once: true }}

@@ -156,10 +156,10 @@ export default function Footer() {
           <div>
             <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
             <address className="not-italic text-muted-foreground">
-              <p>123 Government Plaza</p>
-              <p>New Delhi, 110001</p>
-              <p className="mt-2">Email: info@Nvs Book Store.com</p>
-              <p>Phone: +91 98765 43210</p>
+              <p>Safakhana Road, Dumraon</p>
+              <p>Dumraon, Buxar, Bihar</p>
+              <p className="mt-2">Email: info.nvsbookstore@gmail.com</p>
+              <p>Phone: +916203662259</p>
             </address>
           </div>
         </div>
