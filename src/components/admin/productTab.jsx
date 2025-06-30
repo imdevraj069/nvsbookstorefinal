@@ -67,7 +67,7 @@ export default function ProductTab() {
   };
 
   const duplicateProduct = async (product) => {
-    const { _id, ...data } = product;
+    const { _id, createdAt, updatedAt, ...data } = product;
     try {
       const res = await axios.post("/api/product", { data });
       const newProduct = res.data.data;
