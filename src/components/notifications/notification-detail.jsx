@@ -1,7 +1,8 @@
+"use client"
 import { Calendar, ExternalLink, FileText, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import "./global.css"
+import "./global.css";
 
 export default function NotificationDetail({ notification }) {
   const {
@@ -87,13 +88,17 @@ export default function NotificationDetail({ notification }) {
             )}
             {location && (
               <tr className="border-b border-border">
-                <td className="bg-muted text-lg font-bold px-4 py-2">Location</td>
+                <td className="bg-muted text-lg font-bold px-4 py-2">
+                  Location
+                </td>
                 <td className="px-4 py-2 text-lg">{location}</td>
               </tr>
             )}
             {formattedLastDate && (
               <tr className="border-b border-border">
-                <td className="bg-muted text-lg font-bold px-4 py-2">Last Date</td>
+                <td className="bg-muted text-lg font-bold px-4 py-2">
+                  Last Date
+                </td>
                 <td className="px-4 py-2 text-lg">{formattedLastDate}</td>
               </tr>
             )}
@@ -102,7 +107,12 @@ export default function NotificationDetail({ notification }) {
 
         <div className="prose dark:prose-invert max-w-none mb-6">
           <p className="text-lg mb-4">{description}</p>
-          {content && <div className="mycontent" dangerouslySetInnerHTML={{ __html: content }} />}
+          {content && (
+            <div
+              className="mycontent"
+              dangerouslySetInnerHTML={{ __html: content }}
+            />
+          )}
         </div>
 
         <div className="flex flex-wrap gap-3 mb-6">
@@ -142,7 +152,71 @@ export default function NotificationDetail({ notification }) {
             </Button>
           )}
 
-          <Button variant="ghost" size="icon">
+          {/* New buttons */}
+          {notification.loginUrl && (
+            <Button variant="outline" asChild className="bg-orange-500">
+              <a
+                href={notification.loginUrl}
+                target="_blank"
+                className="text-white"
+                rel="noopener noreferrer"
+              >
+                🔐 Login
+              </a>
+            </Button>
+          )}
+
+          {notification.resultUrl && (
+            <Button variant="outline" asChild className="bg-green-600">
+              <a
+                href={notification.resultUrl}
+                target="_blank"
+                className="text-white"
+                rel="noopener noreferrer"
+              >
+                📝 Check Result
+              </a>
+            </Button>
+          )}
+
+          {notification.admitCardUrl && (
+            <Button variant="outline" asChild className="bg-purple-600">
+              <a
+                href={notification.admitCardUrl}
+                target="_blank"
+                className="text-white"
+                rel="noopener noreferrer"
+              >
+                🎫 Admit Card
+              </a>
+            </Button>
+          )}
+
+          {/* Share button (unchanged) */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => {
+              if (navigator.share) {
+                navigator
+                  .share({
+                    title: notification.title,
+                    text:
+                      notification.description ||
+                      "Check out this notification!",
+                    url:
+                      typeof window !== "undefined" ? window.location.href : "",
+                  })
+                  .then(() => console.log("Shared successfully"))
+                  .catch((err) => console.error("Share failed:", err));
+              } else {
+                navigator.clipboard
+                  .writeText(window.location.href)
+                  .then(() => alert("Link copied to clipboard!"))
+                  .catch(() => alert("Failed to copy link."));
+              }
+            }}
+          >
             <Share2 className="h-4 w-4" />
             <span className="sr-only">Share</span>
           </Button>
@@ -156,9 +230,7 @@ export default function NotificationDetail({ notification }) {
           </p>
         </div>
       </div>
-      <div>
-        advertisement here
-      </div>
+      <div>advertisement here</div>
     </div>
   );
 }
