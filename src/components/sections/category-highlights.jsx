@@ -1,19 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import {
-  Briefcase,
-  GraduationCap,
-  Laptop,
-  BookOpen,
-  ArrowRight,
-} from "lucide-react";
+import { Briefcase, GraduationCap, IdCard, Store } from "lucide-react";
 import { motion } from "motion/react";
-import { FaTelegramPlane, FaWhatsapp } from "react-icons/fa"; // make sure to install react-icons
+import {
+  FaWhatsapp,
+  FaTelegramPlane,
+  FaInstagram,
+  FaYoutube,
+  FaFacebookF,
+} from "react-icons/fa"; // make sure to install react-icons
 
 const categories = [
   {
-    title: "Government Jobs",
+    title: "Jobs",
     description: "Latest job notifications from central and state governments",
     icon: Briefcase,
     href: "/notifications/jobs",
@@ -35,10 +35,10 @@ const categories = [
     count: "Latest Results",
   },
   {
-    title: "Laptops",
+    title: "Store",
     description: "Affordable laptops for students and professionals",
-    icon: Laptop,
-    href: "/notifications/laptops",
+    icon: Store,
+    href: "/store",
     gradient: "from-purple-500 to-pink-500",
     bgGradient:
       "from-purple-50 to-pink-50 dark:from-purple-950/50 dark:to-pink-950/50",
@@ -46,10 +46,10 @@ const categories = [
     count: "Best Deals",
   },
   {
-    title: "Study Materials",
+    title: "PVC Card",
     description: "Quality books, notes and test series for exam preparation",
-    icon: BookOpen,
-    href: "/store",
+    icon: IdCard,
+    href: "/pvc",
     gradient: "from-orange-500 to-red-500",
     bgGradient:
       "from-orange-50 to-red-50 dark:from-orange-950/50 dark:to-red-950/50",
@@ -82,6 +82,39 @@ const itemVariants = {
   },
 };
 
+const socials = [
+  {
+    name: "WhatsApp",
+    icon: <FaWhatsapp className="w-4 h-4 sm:w-5 sm:h-5" />,
+    href: "https://chat.whatsapp.com/KrdsIPFJVD9JFhoQ09Bt2L",
+    colors: "from-green-500 to-green-700",
+  },
+  {
+    name: "Instagram",
+    icon: <FaInstagram className="w-4 h-4 sm:w-5 sm:h-5" />,
+    href: "https://www.instagram.com/abhi_kumar_nvs",
+    colors: "from-pink-500 to-pink-700",
+  },
+  {
+    name: "Telegram",
+    icon: <FaTelegramPlane className="w-4 h-4 sm:w-5 sm:h-5" />,
+    href: "https://t.me/nvsonlinecenter",
+    colors: "from-blue-500 to-blue-700",
+  },
+  {
+    name: "YouTube",
+    icon: <FaYoutube className="w-4 h-4 sm:w-5 sm:h-5" />,
+    href: "https://www.youtube.com/@moryatutorial507",
+    colors: "from-red-500 to-red-700",
+  },
+  {
+    name: "Facebook",
+    icon: <FaFacebookF className="w-4 h-4 sm:w-5 sm:h-5" />,
+    href: "https://www.facebook.com/profile.php?id=100011305176996",
+    colors: "from-blue-600 to-blue-800",
+  },
+];
+
 export default function CategoryHighlights() {
   return (
     <section className="py-6 sm:py-8 lg:py-8 px-4 sm:px-6 lg:px-8 bg-background">
@@ -93,18 +126,7 @@ export default function CategoryHighlights() {
           whileInView={{ y: 0, opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-        >
-          {/* <motion.div
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 border border-orange-200 dark:border-orange-800 mb-4"
-            initial={{ scale: 0.8, opacity: 0 }}
-            whileInView={{ scale: 1, opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-          >
-            <BookOpen className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-            <span className="text-sm font-medium text-orange-700 dark:text-orange-300">Popular Categories</span>
-          </motion.div> */}
-        </motion.div>
+        ></motion.div>
 
         {/* Categories Grid */}
         <motion.div
@@ -123,11 +145,10 @@ export default function CategoryHighlights() {
                 transition: { type: "spring", stiffness: 300, damping: 20 },
               }}
               whileTap={{ scale: 0.98 }}
-              // className={`bg-gradient-to-br ${category.bgGradient} rounded-xl h-full sm:rounded-2xl`}
             >
               <Link href={category.href} className="block group">
                 <div
-                  className={`relative overflow-hidden rounded-xl h-full sm:rounded-2xl p-4 sm:p-6
+                  className={`relative overflow-hidden rounded-xl h-full sm:rounded-2xl p-4 lg:p-6
                   
                     border border-white/20 dark:border-slate-700/50 backdrop-blur-sm transition-all duration-300 hover:shadow-2xl hover:shadow-slate-200/50 dark:hover:shadow-slate-900/50`}
                 >
@@ -140,14 +161,14 @@ export default function CategoryHighlights() {
                   <div className="relative z-10 flex flex-col items-center h-full min-h-[6rem]">
                     {/* Icon */}
                     <motion.div
-                      className={`${category.iconBg} p-2 sm:p-4 rounded-2xl w-10 h-10 lg:w-16 lg:h-16 flex items-center justify-center mb-6 shadow-lg`}
+                      className={`${category.iconBg} p-2 lg:p-4 rounded-2xl w-10 h-10 lg:w-16 lg:h-16 flex items-center justify-center mb-6 shadow-lg`}
                       whileHover={{
                         rotate: [0, -10, 10, -5, 0],
                         scale: 1.1,
                       }}
                       transition={{ duration: 0.5 }}
                     >
-                      <category.icon className="w-4 h-4 lg:w-8 lg:h-8 text-white" />
+                      <category.icon className="w-4 h-4 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-white" />
                     </motion.div>
                     {/* Title */}
                     <h3 className="text-xs text-center sm:text-xl font-bold mb-3 text-slate-900 dark:text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:bg-clip-text group-hover:from-slate-900 group-hover:to-slate-600 dark:group-hover:from-white dark:group-hover:to-slate-300 transition-all duration-300">
@@ -168,42 +189,31 @@ export default function CategoryHighlights() {
 
         {/* Bottom CTA */}
         <motion.div
-          className="text-center mt-6 sm:mt-8"
+          className="text-center mt-4 sm:mt-6"
           initial={{ y: 30, opacity: 0 }}
           whileInView={{ y: 0, opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.4, duration: 0.8 }}
         >
-          <p className="text-slate-600 dark:text-slate-400 mb-6 text-lg font-medium">
+          <p className="text-slate-600 dark:text-slate-400 mb-6 text-sm lg:text-lg font-medium">
             Can't find what you're looking for? Reach out to us!
           </p>
 
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-12">
-            {/* WhatsApp Button */}
-            <motion.a
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              href="https://whatsapp.com/channel/0029VaAMqSs545uqemVLkC0a" // replace with your number
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-green-700 text-white dark:text-white rounded-full font-medium hover:shadow-lg transition-all duration-300"
-            >
-              <FaWhatsapp className="w-5 h-5" />
-              WhatsApp Channel
-            </motion.a>
-
-            {/* Telegram Button */}
-            <motion.a
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              href="https://t.me/yourChannelUsername" // replace with your Telegram link
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white dark:text-white rounded-full font-medium hover:shadow-lg transition-all duration-300"
-            >
-              <FaTelegramPlane className="w-5 h-5" />
-              Telegram Channel
-            </motion.a>
+          <div className="flex flex-wrap justify-center items-center gap-3 sm:gap-4 mb-12">
+            {socials.map(({ name, icon, href, colors }, idx) => (
+              <motion.a
+                key={idx}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`inline-flex items-center gap-2 px-3 py-2 sm:px-5 sm:py-3 bg-gradient-to-r ${colors} text-white rounded-md sm:rounded-full text-xs sm:text-sm font-medium hover:shadow-lg transition-all duration-300`}
+              >
+                {icon}
+                <span className="hidden sm:inline">{name}</span>
+              </motion.a>
+            ))}
           </div>
         </motion.div>
       </div>

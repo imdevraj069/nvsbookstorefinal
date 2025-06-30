@@ -26,16 +26,16 @@ export default function ProductCard({ product }) {
   const isOutOfStock = stock === 0;
 
   return (
-    <div className="group h-full flex flex-col border border-border rounded-lg overflow-hidden hover:border-primary/50 transition-colors bg-amber-50 dark:bg-secondary">
+    <div className="group h-full flex flex-col border border-border rounded-lg overflow-hidden transition-colors bg-amber-50 dark:bg-secondary">
       {/* Image */}
       <Link href={`/store/${_id}`} className="block">
-        <div className="relative aspect-[4/3] bg-muted">
+        <div className="relative aspect-[5/3] bg-muted">
           <Image
             src={image || "/placeholder.svg?height=200&width=300"}
             alt={title}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
-            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            // sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
             loading="lazy" // 👈 Optional (default is lazy)
             placeholder="blur" // Optional: blur while loading
             blurDataURL="/placeholder.svg" // Optional low-res placeholder
@@ -63,7 +63,7 @@ export default function ProductCard({ product }) {
         </div>
 
         {/* Rating */}
-        <div className="flex items-center mt-1">
+        {/* <div className="flex items-center mt-1">
           <div className="flex items-center text-yellow-500">
             {[...Array(5)].map((_, i) => (
               <Star
@@ -75,7 +75,7 @@ export default function ProductCard({ product }) {
             ))}
           </div>
           <span className="text-xs text-muted-foreground ml-2">({rating})</span>
-        </div>
+        </div> */}
 
         {/* Title */}
         <Link href={`/store/${_id}`} className="mt-2">

@@ -12,7 +12,6 @@ import {
   LogIn,
   UserPlus,
 } from "lucide-react";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   NavigationMenu,
@@ -30,11 +29,27 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useSession, signOut } from "next-auth/react";
 import { useCartStore } from "@/utils/store/useCartStore";
+import {
+  FaBell,
+  FaThLarge,
+  FaHome,
+  FaStore,
+  FaEnvelope,
+  FaChevronDown,
+  FaChevronUp,
+  FaGavel,
+} from "react-icons/fa";
+import Marquee from "@/components/marquee"
 
 export default function Navbar() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+
+  const [notifOpen, setNotifOpen] = useState(true);
+  const [otherOpen, setOtherOpen] = useState(false);
+  const [legalOpen, setLegalOpen] = useState(false); // in component
+
   const cartCount = useCartStore((s) => s.getCartCount());
 
   const { data: session, status } = useSession();
@@ -94,74 +109,165 @@ export default function Navbar() {
     >
       <div className="container mx-auto px-4 md:px-16">
         <div className="flex justify-between items-center h-16">
-          {/* Mobile Sidebar Trigger */}
-          <div className="lg:hidden">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-72 sm:w-80">
-                <div className="p-4 space-y-4">
-                  <Link
-                    href="/"
-                    className="block text-lg font-semibold hover:text-primary"
-                  >
-                    Home
-                  </Link>
+          <div className="flex gap-1.5 items-center">
+            {/* Mobile Sidebar Trigger */}
+            <div className="lg:hidden">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-72 sm:w-80">
+                  <div className="p-4 space-y-6">
+                    {/* Home */}
+                    <Link
+                      href="/"
+                      className="flex items-center gap-2 text-lg font-semibold hover:text-primary transition-colors"
+                    >
+                      <FaHome />
+                      Home
+                    </Link>
 
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground">
-                      Notifications
-                    </p>
-                    <MobileLink href="/notifications/results" title="Results" />
-                    <MobileLink href="/notifications/jobs" title="Jobs" />
-                    <MobileLink
-                      href="/notifications/admit-cards"
-                      title="Admit Cards"
-                    />
-                    <MobileLink
-                      href="/notifications/exam-dates"
-                      title="Exam Dates"
-                    />
-                    <MobileLink
-                      href="/notifications/answer-keys"
-                      title="Answer Keys"
-                    />
+                    {/* Notifications Section */}
+                    <div className="space-y-1">
+                      <button
+                        onClick={() => setNotifOpen(!notifOpen)}
+                        className="flex items-center justify-between w-full text-sm font-medium text-muted-foreground"
+                      >
+                        <span className="flex items-center gap-2">
+                          <FaBell />
+                          Notifications
+                        </span>
+                        {notifOpen ? (
+                          <FaChevronUp size={14} />
+                        ) : (
+                          <FaChevronDown size={14} />
+                        )}
+                      </button>
+                      {notifOpen && (
+                        <div className="pl-4 space-y-1">
+                          <MobileLink
+                            href="/notifications/results"
+                            title="Results"
+                          />
+                          <MobileLink href="/notifications/jobs" title="Jobs" />
+                          <MobileLink
+                            href="/notifications/admit-cards"
+                            title="Admit Cards"
+                          />
+                          <MobileLink
+                            href="/notifications/exam-dates"
+                            title="Exam Dates"
+                          />
+                          <MobileLink
+                            href="/notifications/answer-keys"
+                            title="Answer Keys"
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Other Section */}
+                    <div className="space-y-1">
+                      <button
+                        onClick={() => setOtherOpen(!otherOpen)}
+                        className="flex items-center justify-between w-full text-sm font-medium text-muted-foreground"
+                      >
+                        <span className="flex items-center gap-2">
+                          <FaThLarge />
+                          Other
+                        </span>
+                        {otherOpen ? (
+                          <FaChevronUp size={14} />
+                        ) : (
+                          <FaChevronDown size={14} />
+                        )}
+                      </button>
+                      {otherOpen && (
+                        <div className="pl-4 space-y-1">
+                          <MobileLink href="/store?q=laptop" title="Laptops" />
+                          <MobileLink href="/store?q=books" title="Books" />
+                          <MobileLink href="/store?q=notes" title="Notes" />
+                          <MobileLink
+                            href="/store?q=pyq"
+                            title="Previous Papers"
+                          />
+                          <MobileLink
+                            href="/store?q=syllabus"
+                            title="Syllabus"
+                          />
+                          <MobileLink href="/pvc" title="PVC Cards" />
+                          <MobileLink href="/videos" title="Videos" />
+                          <MobileLink href="/blogs" title="Blogs" />
+                          <MobileLink href="/events" title="Events" />
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-1">
+                      <button
+                        onClick={() => setLegalOpen(!legalOpen)}
+                        className="flex items-center justify-between w-full text-sm font-medium text-muted-foreground"
+                      >
+                        <span className="flex items-center gap-2">
+                          <FaGavel />
+                          Legal
+                        </span>
+                        {legalOpen ? (
+                          <FaChevronUp size={14} />
+                        ) : (
+                          <FaChevronDown size={14} />
+                        )}
+                      </button>
+                      {legalOpen && (
+                        <div className="pl-4 space-y-1">
+                          <MobileLink href="/privacy" title="Privacy Policy" />
+                          <MobileLink
+                            href="/terms"
+                            title="Terms & Conditions"
+                          />
+                          <MobileLink href="/return" title="Return Policy" />
+                          <MobileLink
+                            href="/shipping"
+                            title="Shipping Policy"
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Direct Links */}
+                    <div className="space-y-1">
+                      <Link
+                        href="/store"
+                        className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition"
+                      >
+                        <FaStore />
+                        Store
+                      </Link>
+                      <Link
+                        href="/contact"
+                        className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition"
+                      >
+                        <FaEnvelope />
+                        Contact
+                      </Link>
+                    </div>
                   </div>
+                </SheetContent>
+              </Sheet>
+            </div>
 
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground">
-                      Other
-                    </p>
-                    <MobileLink href="/store?q=laptop" title="Laptops" />
-                    <MobileLink href="/store?q=books" title="Books" />
-                    <MobileLink href="/store?q=notes" title="Notes" />
-                    <MobileLink href="/store?q=pyq" title="Previous Papers" />
-                    <MobileLink href="/store?q=syllabus" title="Syllabus" />
-                    <MobileLink href="/pvc" title="PVC Cards" />
-                    <MobileLink href="/videos" title="Videos" />
-                    <MobileLink href="/blogs" title="Blogs" />
-                    <MobileLink href="/events" title="Events" />
-                  </div>
-
-                  <MobileLink href="/store" title="Store" />
-                  <MobileLink href="/contact" title="Contact" />
-                </div>
-              </SheetContent>
-            </Sheet>
+            {/* Logo */}
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
+              <Link href="/" className="flex items-center space-x-2">
+                <Image src="/logo.png" alt="Logo" width={50} height={50} />
+              </Link>
+            </motion.div>
           </div>
-
-          {/* Logo */}
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 400, damping: 10 }}
-          >
-            <Link href="/" className="flex items-center space-x-2">
-              <Image src="/logo.png" alt="Logo" width={50} height={50} />
-            </Link>
-          </motion.div>
 
           {/* Desktop Nav */}
           <div className="hidden lg:block">
@@ -424,6 +530,7 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+      <Marquee />
     </motion.nav>
   );
 }

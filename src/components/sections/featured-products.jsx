@@ -40,8 +40,8 @@ export default function FeaturedProducts() {
   }
 
   return (
-    <div className="py-12 px-2 bg-gradient-to-tl from-red-600 via-red-400 to-red-800 dark:from-red-800 dark:via-red-900 dark:to-red-950">
-      <div className="flex justify-between items-center mb-6">
+    <div className="py-8 px-2 bg-gradient-to-tl from-red-600 via-red-400 to-red-800 dark:from-red-800 dark:via-red-900 dark:to-red-950">
+      <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg text-amber-50 lg:text-2xl font-bold px-4">
           Featured Products
         </h2>
