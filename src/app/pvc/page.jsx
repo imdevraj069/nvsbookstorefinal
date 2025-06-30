@@ -197,15 +197,47 @@ export default function PVCMultiStepForm() {
                       <Label className="text-sm font-semibold text-gray-700">
                         Copies (₹50 each)
                       </Label>
-                      <Input
-                        type="number"
-                        min={1}
-                        className="mb-4"
-                        value={formData[card.id]?.[personIdx]?.copies || 1}
-                        onChange={(e) =>
-                          handleCopiesChange(card.id, personIdx, e.target.value)
-                        }
-                      />
+                      <div className="flex items-center gap-2 mb-4">
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="outline"
+                          onClick={() => {
+                            const current =
+                              formData[card.id]?.[personIdx]?.copies || 1;
+                            if (current > 1) {
+                              handleCopiesChange(
+                                card.id,
+                                personIdx,
+                                current - 1
+                              );
+                            }
+                          }}
+                        >
+                          −
+                        </Button>
+                        <span className="w-8 text-center font-medium">
+                          {formData[card.id]?.[personIdx]?.copies || 1}
+                        </span>
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="outline"
+                          onClick={() => {
+                            const current =
+                              formData[card.id]?.[personIdx]?.copies || 1;
+                            if (current < 5) {
+                              handleCopiesChange(
+                                card.id,
+                                personIdx,
+                                current + 1
+                              );
+                            }
+                          }}
+                        >
+                          ＋
+                        </Button>
+                      </div>
 
                       {defaultFields[card.id].map((field) => (
                         <div key={field} className="mb-2">
