@@ -1,14 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  Plus,
-  Edit,
-  Trash2,
-  Eye,
-  EyeOff,
-  FileText,
-} from "lucide-react";
+import { Plus, Edit, Trash2, Eye, EyeOff, FileText, Star } from "lucide-react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -50,7 +43,7 @@ export default function NotificationsTab() {
       isVisible: notification.isVisible,
       isfeatured: notification.isfeatured,
       lastDate: notification.lastDate?.slice(0, 10),
-      ...notification
+      ...notification,
     });
     setCurrentEditId(notification._id);
     setEditMode(true);
@@ -67,22 +60,6 @@ export default function NotificationsTab() {
     } catch (err) {
       console.error("Failed to duplicate notification", err);
       toast.error("Failed to duplicate notification. Please try again.");
-    }
-  };
-
-  const handleToggleVisibility = async (id) => {
-    try {
-      const res = await axios.patch(`/api/notification/${id}`);
-      const updated = res.data.data;
-      toast.success("Notification visibility updated successfully!");
-      setNotifications((prev) =>
-        prev.map((not) =>
-          not._id === id ? { ...not, isVisible: updated.isVisible } : not
-        )
-      );
-    } catch (err) {
-      console.error("Visibility toggle failed:", err);
-      toast.error("Failed to update notification visibility");
     }
   };
 
@@ -119,19 +96,21 @@ export default function NotificationsTab() {
     setFormData({});
   };
 
-  async function toggleField(id, field) {
+  const toggleField = async(id, field) => {
     try {
-      const response = await axios.patch("/api/notofication/", {
+      const response = await axios.put("/api/notification/", {
         id,
         field
       });
 
       if (response.data.success) {
-        const updated = response.data.data
+        const updated = response.data.data;
         toast.success("✅ Toggled:", field);
         setNotifications((prev) =>
           prev.map((notification) =>
-            notification._id === id ? { ...notification, [field]: updated[field] } : notification
+            notification._id === id
+              ? { ...notification, [field]: updated[field] }
+              : notification
           )
         );
       } else {
@@ -142,6 +121,7 @@ export default function NotificationsTab() {
     } catch (err) {
       toast.error("❌ API error:", err);
       return { success: false, message: "Request failed" };
+      console.log(err)
     }
   }
 
@@ -193,8 +173,10 @@ export default function NotificationsTab() {
                   </td>
                   <td className="p-3 sm:p-4">
                     <div className="flex flex-col gap-1">
-                      <Badge 
-                        variant={notification.isVisible ? "default" : "secondary"}
+                      <Badge
+                        variant={
+                          notification.isVisible ? "default" : "secondary"
+                        }
                         className="text-xs w-fit"
                       >
                         {notification.isVisible ? "Visible" : "Hidden"}
@@ -211,13 +193,28 @@ export default function NotificationsTab() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => handleToggleVisibility(notification._id)}
+                        onClick={() => toggleField(notification._id, "isVisible")}
+                        title="Toggle Visibility"
                       >
                         {!notification.isVisible ? (
                           <EyeOff className="w-4 h-4" />
                         ) : (
                           <Eye className="w-4 h-4" />
                         )}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => toggleField(notification._id, "isfeatured")}
+                        title="Toggle Featured"
+                      >
+                        <Star
+                          className={`w-4 h-4 ${
+                            notification.isfeatured
+                              ? "fill-yellow-400 text-yellow-400"
+                              : "text-muted-foreground"
+                          }`}
+                        />
                       </Button>
                       <Button
                         size="icon"
@@ -230,7 +227,9 @@ export default function NotificationsTab() {
                         size="icon"
                         variant="ghost"
                         className="text-destructive"
-                        onClick={() => handleDeleteNotification(notification._id)}
+                        onClick={() =>
+                          handleDeleteNotification(notification._id)
+                        }
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -254,7 +253,7 @@ export default function NotificationsTab() {
         <NotificationForm
           formData={formData}
           editMode={editMode}
-          currentEditId = {currentEditId}
+          currentEditId={currentEditId}
           onSuccess={handleFormSuccess}
           onCancel={() => {
             setShowNotificationForm(false);

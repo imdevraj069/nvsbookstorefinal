@@ -3,7 +3,8 @@ import {
   getNotificationsByCategory,
   getNotfCatHandler,
   createNotCatHandler,
-  createNotificationHandler
+  createNotificationHandler,
+  toggleField
 } from "@/handler/notification";
 import { Notification } from "@/models/notification.js";
 
@@ -64,5 +65,37 @@ export async function POST(req) {
   } catch (error) {
     console.error(error);
     return new Response("Internal Server Error", { status: 500 });
+  }
+}
+
+export async function PUT(req) {
+  console.log(req)
+  try {
+    const { id, field } = await req.json();
+
+    if (!id || !field) {
+      return Response.json(
+        { success: false, message: "Missing id or field" },
+        { status: 400 }
+      );
+    }
+
+    // safety check
+    if (!["isVisible", "isfeatured"].includes(field)) {
+      return Response.json(
+        { success: false, message: "Invalid field" },
+        { status: 400 }
+      );
+    }
+
+    const result = await toggleField({ id, field, model: Notification });
+    return Response.json(result, { status: result.success ? 200 : 500 });
+  } catch (error) {
+    console.error(error);
+    return{
+      status: 500,
+      body: "Internal Server Error actually",
+      error
+    }
   }
 }
