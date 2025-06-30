@@ -214,13 +214,13 @@ export default function NotificationForm({
             </div>
             <div className="flex items-center space-x-2">
               <input
-                id="isFeatured"
+                id="isfeatured"
                 type="checkbox"
-                checked={form.isFeatured}
+                checked={form.isfeatured}
                 onChange={handleChange}
                 disabled={loading}
               />
-              <Label htmlFor="isFeatured">Is Featured</Label>
+              <Label htmlFor="isfeatured">Is Featured</Label>
             </div>
           </>
         );
