@@ -92,10 +92,12 @@ export async function PATCH(req) {
     return Response.json(result, { status: result.success ? 200 : 500 });
   } catch (error) {
     console.error(error);
-    return{
+    return Response.json(
+      {
       status: 500,
       body: "Internal Server Error actually",
       error
     }
+    )
   }
 }
