@@ -94,74 +94,76 @@ export default function Navbar() {
     >
       <div className="container mx-auto px-4 md:px-16">
         <div className="flex justify-between items-center h-16">
-          {/* Mobile Sidebar Trigger */}
-          <div className="lg:hidden">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-72 sm:w-80">
-                <div className="p-4 space-y-4">
-                  <Link
-                    href="/"
-                    className="block text-lg font-semibold hover:text-primary"
-                  >
-                    Home
-                  </Link>
+          <div className="flex gap-1.5 items-center">
+            {/* Mobile Sidebar Trigger */}
+            <div className="lg:hidden">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-72 sm:w-80">
+                  <div className="p-4 space-y-4">
+                    <Link
+                      href="/"
+                      className="block text-lg font-semibold hover:text-primary"
+                    >
+                      Home
+                    </Link>
 
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground">
-                      Notifications
-                    </p>
-                    <MobileLink href="/notifications/results" title="Results" />
-                    <MobileLink href="/notifications/jobs" title="Jobs" />
-                    <MobileLink
-                      href="/notifications/admit-cards"
-                      title="Admit Cards"
-                    />
-                    <MobileLink
-                      href="/notifications/exam-dates"
-                      title="Exam Dates"
-                    />
-                    <MobileLink
-                      href="/notifications/answer-keys"
-                      title="Answer Keys"
-                    />
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">
+                        Notifications
+                      </p>
+                      <MobileLink href="/notifications/results" title="Results" />
+                      <MobileLink href="/notifications/jobs" title="Jobs" />
+                      <MobileLink
+                        href="/notifications/admit-cards"
+                        title="Admit Cards"
+                      />
+                      <MobileLink
+                        href="/notifications/exam-dates"
+                        title="Exam Dates"
+                      />
+                      <MobileLink
+                        href="/notifications/answer-keys"
+                        title="Answer Keys"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">
+                        Other
+                      </p>
+                      <MobileLink href="/store?q=laptop" title="Laptops" />
+                      <MobileLink href="/store?q=books" title="Books" />
+                      <MobileLink href="/store?q=notes" title="Notes" />
+                      <MobileLink href="/store?q=pyq" title="Previous Papers" />
+                      <MobileLink href="/store?q=syllabus" title="Syllabus" />
+                      <MobileLink href="/pvc" title="PVC Cards" />
+                      <MobileLink href="/videos" title="Videos" />
+                      <MobileLink href="/blogs" title="Blogs" />
+                      <MobileLink href="/events" title="Events" />
+                    </div>
+
+                    <MobileLink href="/store" title="Store" />
+                    <MobileLink href="/contact" title="Contact" />
                   </div>
+                </SheetContent>
+              </Sheet>
+            </div>
 
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground">
-                      Other
-                    </p>
-                    <MobileLink href="/store?q=laptop" title="Laptops" />
-                    <MobileLink href="/store?q=books" title="Books" />
-                    <MobileLink href="/store?q=notes" title="Notes" />
-                    <MobileLink href="/store?q=pyq" title="Previous Papers" />
-                    <MobileLink href="/store?q=syllabus" title="Syllabus" />
-                    <MobileLink href="/pvc" title="PVC Cards" />
-                    <MobileLink href="/videos" title="Videos" />
-                    <MobileLink href="/blogs" title="Blogs" />
-                    <MobileLink href="/events" title="Events" />
-                  </div>
-
-                  <MobileLink href="/store" title="Store" />
-                  <MobileLink href="/contact" title="Contact" />
-                </div>
-              </SheetContent>
-            </Sheet>
+            {/* Logo */}
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
+              <Link href="/" className="flex items-center space-x-2">
+                <Image src="/logo.png" alt="Logo" width={50} height={50} />
+              </Link>
+            </motion.div>
           </div>
-
-          {/* Logo */}
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 400, damping: 10 }}
-          >
-            <Link href="/" className="flex items-center space-x-2">
-              <Image src="/logo.png" alt="Logo" width={50} height={50} />
-            </Link>
-          </motion.div>
 
           {/* Desktop Nav */}
           <div className="hidden lg:block">
