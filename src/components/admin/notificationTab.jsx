@@ -98,7 +98,7 @@ export default function NotificationsTab() {
 
   const toggleField = async(id, field) => {
     try {
-      const response = await axios.put("/api/notification/", {
+      const response = await axios.patch("/api/notification/", {
         id,
         field
       });

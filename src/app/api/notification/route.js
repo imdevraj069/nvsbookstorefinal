@@ -68,7 +68,7 @@ export async function POST(req) {
   }
 }
 
-export async function PUT(req) {
+export async function PATCH(req) {
   console.log(req)
   try {
     const { id, field } = await req.json();
