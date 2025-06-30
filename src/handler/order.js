@@ -23,7 +23,7 @@ export async function getOrdersHandler() {
     }
   }
 
-  const orders = await Order.find().populate('items.product');
+  const orders = await Order.find({}).populate('items.product').sort({createdAt : -1}).lean()
   await redis.set(cacheKey, orders, { ex: 3600 });
 
   return {

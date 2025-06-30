@@ -13,8 +13,14 @@ export default function CartSummary() {
     0
   );
 
-  const discount = cartItems.length > 0 ? 0.1 * subtotal : 0;
-  const shipping = subtotal > 500 ? 0 : 40;
+  const discount = 0;
+
+  // 👇 NEW: check for fully-digital cart
+  const isOnlyDigital = cartItems.every((item) => item.isDigital);
+
+  // 👇 Update shipping logic
+  const shipping = isOnlyDigital ? 0 : subtotal > 500 ? 0 : 40;
+
   const total = subtotal - discount + shipping;
 
   if (!cartCount > 0) {
@@ -69,7 +75,6 @@ export default function CartSummary() {
 
       <div className="mt-4 text-xs text-muted-foreground">
         <p>• Free shipping on orders above ₹500</p>
-        <p>• 30-day return policy</p>
         <p>• Secure payment processing</p>
       </div>
     </div>
