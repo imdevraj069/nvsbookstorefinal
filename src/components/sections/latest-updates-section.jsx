@@ -30,13 +30,13 @@ export default function LatestUpdatesSection() {
 
   const latestResults = allNotifications
     .filter((n) => n.category.slug === "results")
-    .slice(0, 10);
+    .slice(0, 15);
   const latestAdmitCards = allNotifications
     .filter((n) => n.category.slug === "admit-cards")
-    .slice(0, 10);
+    .slice(0, 15);
   const latestJobs = allNotifications
     .filter((n) => n.category.slug === "jobs")
-    .slice(0, 10);
+    .slice(0, 15);
 
   const isNotificationNew = (date) => {
     const notificationDate = new Date(date);
@@ -161,27 +161,6 @@ export default function LatestUpdatesSection() {
                                     NEW
                                   </Badge>
                                 </motion.div>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                              <Calendar className="h-3 w-3" />
-                              <span>
-                                {new Date(notification.date).toLocaleDateString(
-                                  "en-US",
-                                  {
-                                    day: "numeric",
-                                    month: "short",
-                                    year: "numeric",
-                                  }
-                                )}
-                              </span>
-                              {notification.department && (
-                                <>
-                                  <span>•</span>
-                                  <span className="truncate">
-                                    {notification.department}
-                                  </span>
-                                </>
                               )}
                             </div>
                           </div>
