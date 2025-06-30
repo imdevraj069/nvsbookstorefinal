@@ -203,3 +203,34 @@ export async function updateNotification(id, data){
   }
 }
 
+export async function toggleField({ id, field, model, cacheKey = "notifications" }) {
+  await connectDB();
+
+  const item = await model.findById(id);
+  if (!item) {
+    return {
+      success: false,
+      message: `${model.modelName} not found`,
+    };
+  }
+
+  try {
+    item[field] = !item[field];
+    await item.save();
+
+    if (cacheKey) await redis.del(cacheKey);
+
+    return {
+      success: true,
+      message: `${field} toggled successfully`,
+      data: item,
+    };
+  } catch (error) {
+    console.error(`❌ Error toggling ${field}:`, error);
+    return {
+      success: false,
+      message: `Something went wrong while toggling ${field}`,
+      error: error.message,
+    };
+  }
+}

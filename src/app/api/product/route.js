@@ -6,7 +6,6 @@ import {
   toggleField
 } from "@/handler/product";
 import { Product } from "@/models/product";
-import { error } from "console";
 
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
