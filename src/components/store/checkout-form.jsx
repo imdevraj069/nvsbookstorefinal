@@ -32,8 +32,14 @@ export default function CheckoutForm() {
   const clearCartAndSync = useCartStore((s) => s.clearCartAndSync);
 
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  const discount = cartItems.length > 0 ? 0.1 * subtotal : 0;
-  const shipping = subtotal > 500 ? 0 : 40;
+  const discount = 0;
+
+  // 👇 NEW: check for fully-digital cart
+  const isOnlyDigital = cartItems.every((item) => item.isDigital);
+
+  // 👇 Update shipping logic
+  const shipping = isOnlyDigital ? 0 : subtotal > 500 ? 0 : 40;
+
   const total = subtotal - discount + shipping;
 
   useEffect(() => {
