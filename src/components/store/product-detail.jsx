@@ -2,23 +2,13 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import {
-  Star,
-  Minus,
-  Plus,
-  ShoppingCart,
-  Heart,
-  Share2,
-  Bell,
-} from "lucide-react";
+import { Star, Bell, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import AddToCartButton from "@/components/store/add-to-cart";
-import Link from "next/link";
 import toast from "react-hot-toast";
 
 export default function ProductDetail({ product }) {
-  const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("description");
   const [notifying, setNotifying] = useState(false);
 
@@ -41,37 +31,34 @@ export default function ProductDetail({ product }) {
     pages,
     language,
     isbn,
+    content,
   } = product;
-  // Calculate discount percentage if there's an original price
+
   const isOutOfStock = stock === 0;
   const discountPercentage = originalPrice
     ? Math.round(((originalPrice - price) / originalPrice) * 100)
     : 0;
 
-  const incrementQuantity = () => setQuantity((prev) => prev + 1);
-  const decrementQuantity = () => setQuantity((prev) => Math.max(prev - 1, 1));
-
-  const handleNotify = async () =>{
-    toast.success("You will be notifed")
-  }
+  const handleNotify = async () => {
+    setNotifying(true);
+    toast.success("You will be notified!");
+    setTimeout(() => setNotifying(false), 1000);
+  };
 
   return (
-    <div className="mb-12">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Product Images */}
-        <div className="relative h-[400px] bg-muted rounded-lg overflow-hidden">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+      {/* Top Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        {/* Image Section */}
+        <div className="relative bg-muted rounded-2xl p-6 shadow-md min-h-[400px] sm:min-h-[450px]">
           <Image
-            src={
-              images?.[0] || image || "/placeholder.svg?height=400&width=600"
-            }
+            src={images?.[0] || image || "/placeholder.svg"}
             alt={title}
             fill
-            className="object-contain"
+            className="object-contain rounded-xl"
           />
           {isDigital && (
-            <Badge variant="secondary" className="absolute top-4 right-4">
-              Digital
-            </Badge>
+            <Badge className="absolute top-4 right-4">Digital</Badge>
           )}
           {discountPercentage > 0 && (
             <Badge variant="destructive" className="absolute top-4 left-4">
@@ -80,15 +67,19 @@ export default function ProductDetail({ product }) {
           )}
         </div>
 
-        {/* Product Info */}
-        <div>
-          <div className="text-sm text-muted-foreground mb-2">
-            {category.slug}
+        {/* Info Section */}
+        <div className="space-y-6">
+          <div className="text-sm text-muted-foreground uppercase tracking-wide">
+            {category?.slug}
           </div>
-          <h1 className="text-3xl font-bold mb-4">{title}</h1>
 
-          <div className="flex items-center mb-4">
-            <div className="flex items-center text-yellow-500">
+          <h1 className="text-3xl sm:text-4xl font-semibold leading-tight">
+            {title}
+          </h1>
+
+          {/* Rating */}
+          <div className="flex items-center gap-2">
+            <div className="flex text-yellow-500">
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
@@ -98,116 +89,133 @@ export default function ProductDetail({ product }) {
                 />
               ))}
             </div>
-            <span className="text-sm text-muted-foreground ml-2">
-              ({rating}) {reviews?.length || 0} reviews
+            <span className="text-sm text-muted-foreground">
+              ({rating}) • {reviews?.length || 0} Reviews
             </span>
           </div>
 
-          <div className="mb-4">
-            <span className="text-3xl font-bold">₹{price}</span>
+          {/* Price */}
+          <div className="flex items-center gap-4 text-3xl font-bold">
+            ₹{price}
             {originalPrice && (
-              <span className="text-lg text-muted-foreground line-through ml-3">
+              <span className="text-base text-muted-foreground line-through font-medium">
                 ₹{originalPrice}
               </span>
             )}
           </div>
 
-          <p className="text-muted-foreground mb-6">{description}</p>
+          {/* Description */}
+          <p className="text-muted-foreground text-base">{description}</p>
 
-          {/* Product Meta */}
-          <div className="grid grid-cols-2 gap-4 mb-6">
+          {/* Meta Info */}
+          <div className="grid grid-cols-2 gap-4 text-sm">
             {author && (
               <div>
-                <span className="text-sm font-semibold">Author:</span>
-                <p className="text-sm">{author}</p>
+                <span className="font-semibold">Author:</span> {author}
               </div>
             )}
-
             {publisher && (
               <div>
-                <span className="text-sm font-semibold">Publisher:</span>
-                <p className="text-sm">{publisher}</p>
+                <span className="font-semibold">Publisher:</span> {publisher}
               </div>
             )}
-
             {pages && (
               <div>
-                <span className="text-sm font-semibold">Pages:</span>
-                <p className="text-sm">{pages}</p>
+                <span className="font-semibold">Pages:</span> {pages}
               </div>
             )}
-
             {language && (
               <div>
-                <span className="text-sm font-semibold">Language:</span>
-                <p className="text-sm">{language}</p>
+                <span className="font-semibold">Language:</span> {language}
               </div>
             )}
-
             {isbn && (
               <div>
-                <span className="text-sm font-semibold">ISBN:</span>
-                <p className="text-sm">{isbn}</p>
+                <span className="font-semibold">ISBN:</span> {isbn}
               </div>
             )}
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 mb-6">
+          {/* Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
             {!isOutOfStock ? (
               <AddToCartButton product={product} />
             ) : (
               <Button
                 size="lg"
-                variant="default"
                 onClick={handleNotify}
                 disabled={notifying}
+                className="w-full sm:w-auto"
               >
-                <Bell className="h-4 w-4 mr-2" />
+                <Bell className="w-4 h-4 mr-2" />
                 {notifying ? "Subscribing..." : "Notify Me"}
               </Button>
             )}
-            <Button size="lg" variant="outline" className="sm:w-auto">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                if (navigator.share) {
+                  navigator
+                    .share({
+                      title: product.title,
+                      text:
+                        product.description ||
+                        "Check out this notification!",
+                      url:
+                        typeof window !== "undefined"
+                          ? window.location.href
+                          : "",
+                    })
+                    .then(() => console.log("Shared successfully"))
+                    .catch((err) => console.error("Share failed:", err));
+                } else {
+                  navigator.clipboard
+                    .writeText(window.location.href)
+                    .then(() => alert("Link copied to clipboard!"))
+                    .catch(() => alert("Failed to copy link."));
+                }
+              }}
+            >
               <Share2 className="h-4 w-4" />
+              <span className="sr-only">Share</span>
             </Button>
           </div>
 
           {/* Stock Status */}
-          <div className="mb-4">
-            {stock > 0 ? (
-              <span className="text-green-600 text-sm font-medium">
-                ✓ In Stock
-              </span>
-            ) : (
-              <span className="text-red-600 text-sm font-medium">
-                ✗ Out of Stock
-              </span>
-            )}
-          </div>
+          <p
+            className={`text-sm font-medium ${
+              isOutOfStock ? "text-red-600" : "text-green-600"
+            }`}
+          >
+            {isOutOfStock ? "✗ Out of Stock" : "✓ In Stock"}
+          </p>
         </div>
       </div>
 
-      {/* Product Details Tabs */}
-      <div className="mt-12">
-        <div className="border-b border-border">
-          <nav className="flex space-x-8">
-            {["description", "specifications", "reviews"].map((tab) => (
+      {/* Tabs Section */}
+      <div className="space-y-4">
+        <nav className="flex overflow-x-auto border-b border-border -mb-px gap-6 text-sm sm:text-base font-medium">
+          {["description", "specifications", "reviews", "content"].map(
+            (tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                className={`pb-2 border-b-2 whitespace-nowrap transition-all ${
                   activeTab === tab
                     ? "border-primary text-primary"
                     : "border-transparent text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                {tab === "content"
+                  ? "Additional Info"
+                  : tab.charAt(0).toUpperCase() + tab.slice(1)}
               </button>
-            ))}
-          </nav>
-        </div>
+            )
+          )}
+        </nav>
 
-        <div className="py-6">
+        <div className="pt-4">
           {activeTab === "description" && (
             <div className="prose dark:prose-invert max-w-none">
               <p>{longDescription || description}</p>
@@ -215,7 +223,7 @@ export default function ProductDetail({ product }) {
           )}
 
           {activeTab === "specifications" && specifications && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {Object.entries(specifications).map(([key, value]) => (
                 <div
                   key={key}
@@ -230,12 +238,15 @@ export default function ProductDetail({ product }) {
 
           {activeTab === "reviews" && (
             <div className="space-y-6">
-              {reviews && reviews.length > 0 ? (
+              {reviews?.length > 0 ? (
                 reviews.map((review) => (
-                  <div key={review._id} className="border-b border-border pb-4">
-                    <div className="flex items-center mb-2">
-                      <span className="font-medium mr-2">{review.user}</span>
-                      <div className="flex items-center text-yellow-500">
+                  <div
+                    key={review._id}
+                    className="border-b border-border pb-4 space-y-1"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium">{review.user}</span>
+                      <div className="flex text-yellow-500">
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}
@@ -246,15 +257,24 @@ export default function ProductDetail({ product }) {
                         ))}
                       </div>
                     </div>
-                    <p className="text-muted-foreground">{review.comment}</p>
+                    <p className="text-muted-foreground text-sm">
+                      {review.comment}
+                    </p>
                   </div>
                 ))
               ) : (
                 <p className="text-muted-foreground">
-                  No reviews yet. Be the first to review this product!
+                  No reviews yet. Be the first to review!
                 </p>
               )}
             </div>
+          )}
+
+          {activeTab === "content" && content && (
+            <div
+              className="prose dark:prose-invert max-w-none"
+              dangerouslySetInnerHTML={{ __html: content }}
+            />
           )}
         </div>
       </div>
