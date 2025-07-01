@@ -9,7 +9,6 @@ import AddToCartButton from "@/components/store/add-to-cart";
 import toast from "react-hot-toast";
 
 export default function ProductDetail({ product }) {
-  const [activeTab, setActiveTab] = useState("description");
   const [notifying, setNotifying] = useState(false);
 
   const {
@@ -47,9 +46,9 @@ export default function ProductDetail({ product }) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
-      {/* Top Grid */}
+      {/* Top Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-        {/* Image Section */}
+        {/* Image */}
         <div className="relative bg-muted rounded-2xl p-6 shadow-md min-h-[400px] sm:min-h-[450px]">
           <Image
             src={images?.[0] || image || "/placeholder.svg"}
@@ -67,7 +66,7 @@ export default function ProductDetail({ product }) {
           )}
         </div>
 
-        {/* Info Section */}
+        {/* Info */}
         <div className="space-y-6">
           <div className="text-sm text-muted-foreground uppercase tracking-wide">
             {category?.slug}
@@ -159,9 +158,7 @@ export default function ProductDetail({ product }) {
                   navigator
                     .share({
                       title: product.title,
-                      text:
-                        product.description ||
-                        "Check out this notification!",
+                      text: product.description || "Check this out!",
                       url:
                         typeof window !== "undefined"
                           ? window.location.href
@@ -193,91 +190,81 @@ export default function ProductDetail({ product }) {
         </div>
       </div>
 
-      {/* Tabs Section */}
-      <div className="space-y-4">
-        <nav className="flex overflow-x-auto border-b border-border -mb-px gap-6 text-sm sm:text-base font-medium">
-          {["description", "specifications", "reviews", "content"].map(
-            (tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`pb-2 border-b-2 whitespace-nowrap transition-all ${
-                  activeTab === tab
-                    ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
-                }`}
+      {/* Description Section */}
+      {longDescription && (
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">Description</h2>
+          <div
+            className="prose dark:prose-invert max-w-none" 
+          
+            dangerouslySetInnerHTML={{ __html: longDescription }}
+          />
+        </section>
+      )}
+
+      {/* Specifications */}
+      {specifications && Object.keys(specifications).length > 0 && (
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">Specifications</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {Object.entries(specifications).map(([key, value]) => (
+              <div
+                key={key}
+                className="flex justify-between py-2 border-b border-border"
               >
-                {tab === "content"
-                  ? "Additional Info"
-                  : tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </button>
-            )
-          )}
-        </nav>
+                <span className="font-medium">{key}:</span>
+                <span className="text-muted-foreground">{value}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
-        <div className="pt-4">
-          {activeTab === "description" && (
-            <div className="prose dark:prose-invert max-w-none">
-              <p>{longDescription || description}</p>
-            </div>
-          )}
-
-          {activeTab === "specifications" && specifications && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {Object.entries(specifications).map(([key, value]) => (
-                <div
-                  key={key}
-                  className="flex justify-between py-2 border-b border-border"
-                >
-                  <span className="font-medium">{key}:</span>
-                  <span className="text-muted-foreground">{value}</span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {activeTab === "reviews" && (
-            <div className="space-y-6">
-              {reviews?.length > 0 ? (
-                reviews.map((review) => (
-                  <div
-                    key={review._id}
-                    className="border-b border-border pb-4 space-y-1"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium">{review.user}</span>
-                      <div className="flex text-yellow-500">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`h-4 w-4 ${
-                              i < review.rating ? "fill-current" : "fill-none"
-                            }`}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                    <p className="text-muted-foreground text-sm">
-                      {review.comment}
-                    </p>
+      {/* Reviews */}
+      <section>
+        <h2 className="text-2xl font-semibold mb-4">Reviews</h2>
+        {reviews?.length > 0 ? (
+          <div className="space-y-6">
+            {reviews.map((review) => (
+              <div
+                key={review._id}
+                className="border-b border-border pb-4 space-y-1"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">{review.user}</span>
+                  <div className="flex text-yellow-500">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`h-4 w-4 ${
+                          i < review.rating ? "fill-current" : "fill-none"
+                        }`}
+                      />
+                    ))}
                   </div>
-                ))
-              ) : (
-                <p className="text-muted-foreground">
-                  No reviews yet. Be the first to review!
+                </div>
+                <p className="text-muted-foreground text-sm">
+                  {review.comment}
                 </p>
-              )}
-            </div>
-          )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-muted-foreground">
+            No reviews yet. Be the first to review!
+          </p>
+        )}
+      </section>
 
-          {activeTab === "content" && content && (
-            <div
-              className="prose dark:prose-invert max-w-none"
-              dangerouslySetInnerHTML={{ __html: content }}
-            />
-          )}
-        </div>
-      </div>
+      {/* Rich Content (Tiptap HTML) */}
+      {content && (
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">Additional Info</h2>
+          <div
+            className="prose dark:prose-invert max-w-none"
+          />
+        </section>
+      )}
     </div>
   );
 }

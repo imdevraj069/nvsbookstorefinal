@@ -128,7 +128,7 @@ const productSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    specification: {
+    specifications: {
       type: Object,
       default: {},
     },
