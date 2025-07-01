@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Briefcase, GraduationCap, IdCard, Store } from "lucide-react";
+import { Briefcase, GraduationCap, IdCard, Store, Frame } from "lucide-react";
 import { motion } from "motion/react";
 import {
   FaWhatsapp,
@@ -24,10 +24,10 @@ const categories = [
     count: "500+ Jobs",
   },
   {
-    title: "Exam Results",
-    description: "Check your results for various competitive exams",
-    icon: GraduationCap,
-    href: "/notifications/results",
+    title: "Photo Frames",
+    description: "Get Your Customised photo Frames",
+    icon: Frame,
+    href: "/store?photo-frame",
     gradient: "from-emerald-500 to-teal-500",
     bgGradient:
       "from-emerald-50 to-teal-50 dark:from-emerald-950/50 dark:to-teal-950/50",
