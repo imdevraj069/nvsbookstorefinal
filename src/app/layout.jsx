@@ -6,6 +6,7 @@ import Footer from "@/components/layout/footer";
 import Navbar from "@/components/layout/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Providers } from "@/lib/provider";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,6 +28,7 @@ export default function RootLayout({ children }) {
         <meta name="google-site-verification" content="58kmXpJs2zFCjH4QktlPy8X0-Mev-zeZfigGGDDCluY" />
       </head>
       <body className={`${inter.className} pt-16`}>
+        <GoogleAnalytics trackingId="G-ZTL8VDD24J" />
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
