@@ -35,6 +35,7 @@ export default function OrdersAdmin() {
       setLoading(true);
       const res = await axios.get("/api/admin/orders");
       setOrders(res.data.data);
+      console.log(res.data.data)
     } catch (err) {
       toast.error("Failed to load orders");
     } finally {
@@ -111,6 +112,7 @@ export default function OrdersAdmin() {
                       <SelectContent>
                         {[
                           "pending",
+                          "paid",
                           "processing",
                           "shipped",
                           "delivered",
