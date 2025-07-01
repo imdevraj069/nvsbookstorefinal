@@ -305,8 +305,8 @@ export default function ProductTab() {
 
       {showProductForm && (
         <ProductForm
-          // isOpen={showProductForm}
-          onCancel={handleFormClose}
+          isOpen={showProductForm}
+          onClose={handleFormClose}
           onSubmit={handleFormSubmit}
           editMode={editMode}
           initialData={formData}

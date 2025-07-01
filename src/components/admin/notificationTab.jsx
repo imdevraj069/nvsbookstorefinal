@@ -121,7 +121,7 @@ export default function NotificationsTab() {
     } catch (err) {
       toast.error("❌ API error:", err);
       return { success: false, message: "Request failed" };
-      console.log(err)
+      console.error(err)
     }
   }
 

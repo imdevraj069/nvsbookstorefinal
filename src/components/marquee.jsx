@@ -15,7 +15,6 @@ export default function NotMarquee() {
         const res = await axios.get("/api/notification");
         const data = res.data;
         setAllNotifications(data.data || []);
-        console.log(data.data)
       } catch (error) {
         console.error("Error fetching notifications:", error);
       } finally {

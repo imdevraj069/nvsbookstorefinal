@@ -1,4 +1,4 @@
-import {getProductbyId, toggleField, toggleVisibility, deleteCategory, updateCategory, toggleFeatured} from '../../../../handler/product';
+import {getProductbyId, deleteCategory, updateCategory} from '../../../../handler/product';
 
 export async function GET(req, {params}){
   await connectDB()
