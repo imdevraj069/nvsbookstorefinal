@@ -33,24 +33,43 @@ export async function getOrdersHandler() {
 }
 
 export async function createOrderHandler(req) {
-  await connectDB()
-
-  const session = await getServerSession(authOptions)
+  await connectDB();
+  const session = await getServerSession(authOptions);
   if (!session || !session.user) {
     return {
       success: false,
       status: 401,
       error: "Unauthorized",
-    }
+    };
   }
 
-  const { items, customerName, customerEmail, customerPhone, shippingAddress, paymentMethod, price } = req
+  const {
+    items,
+    customerName,
+    customerEmail,
+    customerPhone,
+    shippingAddress,
+    paymentMethod,
+    price,
+    razorpayPaymentId,
+    razorpayOrderId,
+    razorpaySignature,
+  } = req;
 
+  // ✅ Verify Razorpay Signature (for card/upi/netbanking)
   if (paymentMethod !== "cod") {
-    return {
-      success: false,
-      status: 400,
-      error: "Only COD is allowed currently",
+    const crypto = await import("crypto");
+    const body = razorpayOrderId + "|" + razorpayPaymentId;
+    const expectedSignature = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+      .update(body.toString())
+      .digest("hex");
+
+    if (expectedSignature !== razorpaySignature) {
+      return {
+        success: false,
+        status: 400,
+        error: "Payment verification failed",
+      };
     }
   }
 
@@ -64,13 +83,16 @@ export async function createOrderHandler(req) {
       items,
       paymentMethod,
       price,
-    })
+      razorpayOrderId,
+      razorpayPaymentId,
+      razorpaySignature,
+      status: paymentMethod === "cod" ? "pending" : "paid",
+    });
 
-    const order = await Order.findById(createdOrder._id).populate("items.product")
+    const order = await Order.findById(createdOrder._id).populate("items.product");
+    await redis.del("orders");
 
-    await redis.del("orders")
-
-    // Send emails to user and admin
+    // Emails
     await sendEmail({
       to: customerEmail,
       subject: "✅ Order Confirmation - NVS Book Store",
@@ -79,29 +101,26 @@ export async function createOrderHandler(req) {
 
     await sendEmail({
       to: process.env.ADMIN_MAIL,
-      subject: `📦 New Order: ${customerName}`,
+      subject: `📦 New Paid Order from ${customerName}`,
       html: renderAdminOrderNotificationEmail(order),
     });
 
-    return {
-      success: true,
-      status: 201,
-      data: order,
-    }
+    return { success: true, status: 201, data: order };
   } catch (error) {
-    console.error("Order creation error:", error)
+    console.error("Order creation error:", error);
     return {
       success: false,
       status: 500,
       error: "Server error creating order",
-    }
+    };
   }
 }
+
 
 export async function updateOrderStatusHandler(orderId, newStatus) {
   await connectDB();
 
-  const validStatuses = ["pending", "processing", "shipped", "delivered", "cancelled"];
+  const validStatuses = ["pending", "processing", "shipped", "delivered", "cancelled", "paid"];
   if (!validStatuses.includes(newStatus)) {
     return {
       success: false,
