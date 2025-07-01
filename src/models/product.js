@@ -92,6 +92,10 @@ const productSchema = new mongoose.Schema(
       required: true,
       default: 0,
     },
+    content: {
+      type: String,
+      default: "",
+    },
     isDigital: {
       type: Boolean,
       default: false,
