@@ -108,7 +108,7 @@ export default function PVCForm() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+    <div className="max-w-2xl mx-auto px-4 pt-12 space-y-6 min-h-screen">
       <Script src="https://checkout.razorpay.com/v1/checkout.js" />
 
       <h1 className="text-2xl sm:text-3xl font-bold text-center">

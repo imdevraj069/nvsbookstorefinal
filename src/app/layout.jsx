@@ -7,6 +7,7 @@ import Navbar from "@/components/layout/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Providers } from "@/lib/provider";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import FloatingSupport from "@/components/floating"
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -50,6 +51,7 @@ export default function RootLayout({ children }) {
               />
               <Navbar />
               {children}
+              <FloatingSupport/>
               <Footer />
             </PageTransition>
           </Providers>
