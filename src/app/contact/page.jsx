@@ -15,13 +15,13 @@ const contactInfo = [
   {
     icon: Mail,
     title: "Email",
-    details: ["abhishekkumar45458@gmail.com", "info.nvsbookstore@gmail.com"],
+    details: ["info.nvsbookstore@gmail.com"],
     gradient: "from-blue-500 to-cyan-500",
   },
   {
     icon: Phone,
     title: "Phone",
-    details: ["+91 91226 21410", "+91 6203 662 259"],
+    details: ["+91 9142324498 (whatsapp)", "+91 6203 662 259"],
     gradient: "from-emerald-500 to-teal-500",
   },
   {

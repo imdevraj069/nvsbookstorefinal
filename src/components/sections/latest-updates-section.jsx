@@ -56,7 +56,7 @@ export default function LatestUpdatesSection() {
       icon: "💼",
     },
     {
-      title: "Latest Results",
+      title: "Latest Results / Others ",
       notifications: latestResults,
       href: "/notifications/results",
       gradient: "from-green-500 to-emerald-600",

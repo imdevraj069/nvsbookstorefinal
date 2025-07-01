@@ -125,15 +125,27 @@ export const renderAdminOrderNotificationEmail = (order) => `
           <p style="margin:8px 0;font-size:16px;">From ${order.customerName}</p>
         </div>
 
-        <!-- Details -->
+        <!-- Customer Details -->
         <div style="padding:24px;">
           <p><strong>Email:</strong> ${order.customerEmail}</p>
           <p><strong>Phone:</strong> ${order.customerPhone}</p>
           <p><strong>Payment Method:</strong> ${order.paymentMethod}</p>
           <p><strong>Total Amount:</strong> ₹${order.price.total.toFixed(2)}</p>
+        </div>
 
-          <h3 style="margin-top:24px;font-size:18px;">🛍️ Items</h3>
-          <table style="width:100%;border-collapse:collapse;margin-top:8px;">
+        <!-- Shipping Address -->
+        <div style="padding:0 24px 24px 24px;">
+          <h3 style="font-size:18px;margin-bottom:8px;">🚚 Shipping Address</h3>
+          <p style="margin:0;">
+            ${order.shippingAddress.address},<br/>
+            ${order.shippingAddress.city}, ${order.shippingAddress.state} - ${order.shippingAddress.pincode}
+          </p>
+        </div>
+
+        <!-- Items Table -->
+        <div style="padding:0 24px 24px 24px;">
+          <h3 style="font-size:18px;margin-bottom:8px;">🛍️ Items</h3>
+          <table style="width:100%;border-collapse:collapse;">
             <thead>
               <tr style="background:#f0f0f0;text-align:left;">
                 <th style="padding:10px;font-size:14px;">Product</th>
@@ -163,6 +175,7 @@ export const renderAdminOrderNotificationEmail = (order) => `
     </body>
   </html>
 `;
+
 
 
 export const renderUserOrderStatusUpdateEmail = (order) => `
