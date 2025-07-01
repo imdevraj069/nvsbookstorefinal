@@ -35,6 +35,8 @@ export default function ProductForm({
   const [newSpecValue, setNewSpecValue] = useState("");
   const [uploading, setUploading] = useState(false);
   const [digitalInputMode, setDigitalInputMode] = useState("upload");
+  const [enableGallery, setEnableGallery] = useState(false);
+  const [newImageUrl, setNewImageUrl] = useState("");
 
   const defaultFormData = {
     title: "",
@@ -94,7 +96,7 @@ export default function ProductForm({
       ...formData,
       category: selectedCategory,
     };
-    console.log(dataToSend)
+    console.log(dataToSend);
     try {
       await onSubmit(dataToSend);
       handleCancel();
@@ -215,6 +217,73 @@ export default function ProductForm({
                 className="mt-2 h-[120px] w-auto object-contain"
               />
             )}
+
+            <Label>Upload Additional Images</Label>
+            <Input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={async (e) => {
+                const files = Array.from(e.target.files);
+                if (!files.length) return;
+                setUploading(true);
+
+                const newImages = [];
+                for (const file of files) {
+                  const form = new FormData();
+                  form.append("file", file);
+                  try {
+                    const res = await fetch("/api/upload", {
+                      method: "POST",
+                      body: form,
+                    });
+                    const data = await res.json();
+                    newImages.push(data.url);
+                  } catch (err) {
+                    console.error("Image upload error:", err);
+                    toast.error("Some image(s) failed to upload.");
+                  }
+                }
+
+                setFormData((prev) => ({
+                  ...prev,
+                  images: [...prev.images, ...newImages],
+                }));
+                setUploading(false);
+                toast.success("Images uploaded");
+              }}
+              disabled={uploading}
+            />
+
+            {/* Gallery Preview */}
+            <div className="grid grid-cols-3 gap-2 mt-2">
+              {formData.images.map((img, idx) => (
+                <div
+                  key={idx}
+                  className="relative group border rounded overflow-hidden"
+                >
+                  <Image
+                    src={img}
+                    alt={`Gallery ${idx + 1}`}
+                    width={150}
+                    height={100}
+                    className="object-cover w-full h-28"
+                  />
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        images: prev.images.filter((_, i) => i !== idx),
+                      }))
+                    }
+                    className="absolute top-1 right-1 text-xs bg-red-500 text-white px-1 rounded hover:bg-red-600"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
 
             <Label htmlFor="category">Category</Label>
             <div className="flex gap-2">
@@ -512,7 +581,9 @@ export default function ProductForm({
             key={index}
             onClick={() => setActiveTab(index)}
             className={`px-4 py-2 text-sm text-left rounded-md transition mb-1 ${
-              activeTab === index ? "bg-blue-100 font-semibold" : "hover:bg-gray-200"
+              activeTab === index
+                ? "bg-blue-100 font-semibold"
+                : "hover:bg-gray-200"
             }`}
           >
             {tab}
