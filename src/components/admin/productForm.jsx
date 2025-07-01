@@ -364,7 +364,6 @@ export default function ProductForm({
                     }`}
                     onClick={() => {
                       setDigitalInputMode("upload");
-                      setFormData((prev) => ({ ...prev, digitalUrl: "" }));
                     }}
                   >
                     Upload
@@ -378,7 +377,6 @@ export default function ProductForm({
                     }`}
                     onClick={() => {
                       setDigitalInputMode("url");
-                      setFormData((prev) => ({ ...prev, digitalUrl: "" }));
                     }}
                   >
                     Use URL
