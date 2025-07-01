@@ -113,6 +113,9 @@ importers:
       nodemailer:
         specifier: ^6.10.1
         version: 6.10.1
+      razorpay:
+        specifier: ^2.9.6
+        version: 2.9.6
       react:
         specifier: ^19.0.0
         version: 19.1.0
@@ -1786,6 +1789,9 @@ packages:
       You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
 
       (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
+
+  razorpay@2.9.6:
+    resolution: {integrity: sha512-zsHAQzd6e1Cc6BNoCNZQaf65ElL6O6yw0wulxmoG5VQDr363fZC90Mp1V5EktVzG45yPyNomNXWlf4cQ3622gQ==}
 
   react-dom@19.1.0:
     resolution: {integrity: sha512-Xs1hdnE+DyKgeHJeJznQmYMIBG3TKIHJJT95Q58nHLSrElKlGQqDTR2HQ9fx5CN/Gk6Vh/kupBTDLU11/nDk/g==}
@@ -3534,6 +3540,12 @@ snapshots:
   punycode@2.3.1: {}
 
   q@1.5.1: {}
+
+  razorpay@2.9.6:
+    dependencies:
+      axios: 1.10.0
+    transitivePeerDependencies:
+      - debug
 
   react-dom@19.1.0(react@19.1.0):
     dependencies:

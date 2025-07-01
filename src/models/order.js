@@ -30,9 +30,13 @@ const orderSchema = new mongoose.Schema(
       },
     ],
     paymentMethod: String,
+    razorpayOrderId: String,
+    razorpayPaymentId: String,
+    razorpaySignature: String,
     status: {
       type: String,
-      default: "pending",
+      default: "pending", // will change to "paid" after verification
+      enum: ["pending", "paid", "processing", "shipped", "delivered", "cancelled"],
     },
     price: {
       subtotal: Number,
