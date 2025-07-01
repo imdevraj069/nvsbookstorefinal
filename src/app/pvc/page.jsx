@@ -1,304 +1,260 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import toast from "react-hot-toast";
 import axios from "axios";
+import Script from "next/script";
 
-const cardOptions = [
-  { id: "aadhaar", name: "Aadhaar Card" },
-  { id: "pan", name: "PAN Card" },
-  { id: "driving", name: "Driving License" },
-  { id: "voter", name: "Voter ID" },
-  { id: "rc", name: "RC (Vehicle)" },
-  { id: "ayushman", name: "Ayushman Card" },
-];
-
-const defaultFields = {
-  aadhaar: ["fullName", "aadhaarNumber", "mobile"],
-  pan: ["fullName", "panNumber", "dob", "mobile"],
-  driving: ["fullName", "dlNumber", "state", "mobile"],
-  voter: ["fullName", "voterId", "state", "mobile"],
-  rc: ["fullName", "rcNumber", "vehicleNumber", "mobile"],
-  ayushman: ["fullName", "abhaOrAadhaar", "mobile"],
-};
-
-export default function PVCMultiStepForm() {
+export default function PVCForm() {
   const [step, setStep] = useState(1);
-  const [selection, setSelection] = useState([]);
+  const [mode, setMode] = useState("copy");
+  const [cardType, setCardType] = useState("");
+  const [copies, setCopies] = useState(1);
   const [formData, setFormData] = useState({});
+  const [address, setAddress] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSelectCard = (id) => {
-    setSelection((prev) =>
-      prev.some((s) => s.id === id)
-        ? prev.filter((s) => s.id !== id)
-        : [...prev, { id, peopleCount: 1 }]
-    );
+  const copyFields = {
+    aadhaar: ["fullName", "aadhaarNumber", "mobile"],
+    pan: ["fullName", "panNumber", "dob", "mobile"],
+    driving: ["fullName", "dlNumber", "state", "mobile"],
+    voter: ["fullName", "voterId", "state", "mobile"],
+    rc: ["fullName", "rcNumber", "vehicleNumber", "mobile"],
+    ayushman: ["fullName", "abhaOrAadhaar", "mobile"],
   };
 
-  const handleFieldChange = (cardId, personIdx, key, value) => {
-    setFormData((prev) => {
-      const cardEntries = prev[cardId] || [];
-      const updated = [...cardEntries];
-      if (!updated[personIdx]) updated[personIdx] = { copies: 1 };
-      updated[personIdx][key] = value;
-      return { ...prev, [cardId]: updated };
-    });
-  };
+  const lostAltField =
+    cardType === "aadhaar"
+      ? { label: "PAN Number", key: "panNumber" }
+      : cardType === "pan"
+      ? { label: "Aadhaar Number", key: "aadhaarNumber" }
+      : null;
 
-  const handleCopiesChange = (cardId, personIdx, value) => {
-    setFormData((prev) => {
-      const cardEntries = prev[cardId] || [];
-      const updated = [...cardEntries];
-      if (!updated[personIdx]) updated[personIdx] = {};
-      updated[personIdx].copies = parseInt(value) || 1;
-      return { ...prev, [cardId]: updated };
-    });
-  };
+  const totalAmount = (mode === "lost" ? 249 : 99) + (copies - 1) * 99;
 
-  const handleSubmitStep1 = () => {
-    if (selection.length === 0) return toast.error("Select at least one card");
-    const structured = {};
-    selection.forEach(({ id, peopleCount }) => {
-      structured[id] = Array.from({ length: peopleCount }, () => ({
-        copies: 1,
-      }));
-    });
-    setFormData(structured);
+  const handleNext = () => {
+    if (!cardType) return toast.error("Please select a card type");
     setStep(2);
   };
 
-  const handleSubmitFinal = async () => {
-    const items = [];
-    for (let card of selection) {
-      const entries = formData[card.id] || [];
-      for (let entry of entries) {
-        if (!entry.mobile) return toast.error("Mobile number is required");
-        items.push({
-          productType: card.id,
-          copies: entry.copies || 1,
-          details: entry,
-        });
-      }
-    }
+  const handleRazorpayPayment = async () => {
+    if (!address.trim()) return toast.error("Address is required");
+    if (!formData.mobile) return toast.error("Mobile number is required");
 
-    setIsLoading(true);
+    const item = {
+      productType: cardType,
+      mode,
+      copies,
+      details: formData,
+    };
+
     try {
-      const res = await axios.post("/api/pvc-order", {
-        items,
-        paymentMethod: "cod",
+      setIsLoading(true);
+      // Create Razorpay order
+      const { data } = await axios.post("/api/payment", {
+        amount: totalAmount,
       });
-      toast.success("Order submitted successfully!");
-      setStep(1);
-      setFormData({});
-      setSelection([]);
+
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: data.order.amount,
+        currency: "INR",
+        name: "PVC Card Order",
+        description: "PVC Card Printing",
+        order_id: data.order.id,
+        handler: async function (response) {
+          try {
+            await axios.post("/api/pvc-order", {
+              items: [item],
+              paymentMethod: "razorpay",
+              address,
+              price: totalAmount,
+              razorpay: {
+                orderId: data.order.id,
+                paymentId: response.razorpay_payment_id,
+                signature: response.razorpay_signature,
+              },
+            });
+            toast.success("Order placed successfully!");
+            setStep(1);
+            setCardType("");
+            setMode("copy");
+            setCopies(1);
+            setFormData({});
+            setAddress("");
+          } catch {
+            toast.error("Order saving failed after payment");
+          }
+        },
+        prefill: {
+          name: formData.fullName || "Customer",
+          email: "", // optional
+          contact: formData.mobile || "",
+        },
+        theme: { color: "#22c55e" },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
     } catch (err) {
-      toast.error("Order submission failed");
+      console.error(err);
+      toast.error("Payment failed");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const grandTotal = Object.values(formData)
-    .flat()
-    .reduce((acc, entry) => acc + (entry.copies || 1) * 50, 0);
-
   return (
-    <div className="min-h-screen flex items-center justify-center pt-6">
-      <div className="max-w-4xl mx-auto p-6 space-y-6 bg-white rounded-2xl shadow-xl">
-        <h1 className="text-2xl sm:text-3xl font-bold text-center">
-          PVC Card Printing Service
-        </h1>
+    <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" />
 
-        {step === 1 && (
-          <>
-            <h2 className="font-medium text-lg">
-              Step 1: Select Cards & Order Details
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {cardOptions.map((card) => {
-                const selected = selection.find((s) => s.id === card.id);
-                return (
-                  <div
-                    key={card.id}
-                    onClick={() => handleSelectCard(card.id)}
-                    className={`cursor-pointer border p-4 rounded-xl space-y-2 shadow-sm transition-all flex flex-col gap-2 ${
-                      selected
-                        ? "border-green-600 bg-green-50"
-                        : "border-gray-300"
-                    }`}
-                  >
-                    <div className="flex justify-between items-center">
-                      <span className="font-semibold">{card.name}</span>
-                      <span
-                        className={`w-5 h-5 inline-block rounded-full border-2 transition ${
-                          selected
-                            ? "bg-green-600 border-green-600"
-                            : "border-gray-400"
-                        }`}
-                      />
-                    </div>
-                    {selected && (
-                      <div>
-                        <Label>Number of People</Label>
-                        <Input
-                          type="number"
-                          min={1}
-                          value={selected.peopleCount}
-                          onClick={(e) => e.stopPropagation()}
-                          onChange={(e) => {
-                            const peopleCount = parseInt(e.target.value);
-                            setSelection((prev) =>
-                              prev.map((s) =>
-                                s.id === card.id ? { ...s, peopleCount } : s
-                              )
-                            );
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-            <Button
-              onClick={handleSubmitStep1}
-              className="mt-6 w-full rounded-xl"
-            >
-              Continue
-            </Button>
-          </>
-        )}
+      <h1 className="text-2xl sm:text-3xl font-bold text-center">
+        PVC Card Printing
+      </h1>
 
-        {step === 2 && (
-          <>
-            <h2 className="font-medium text-lg">Step 2: Enter Details</h2>
-            {selection.map((card) => (
-              <div
-                key={card.id}
-                className="border border-gray-300 p-4 rounded-xl mb-6 bg-muted/20"
+      {step === 1 && (
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>What do you need?</Label>
+            <div className="flex gap-4">
+              <Button
+                variant={mode === "copy" ? "default" : "outline"}
+                onClick={() => setMode("copy")}
               >
-                <h3 className="font-semibold text-lg mb-2">
-                  {cardOptions.find((c) => c.id === card.id)?.name}
-                </h3>
-                {Array.from({ length: card.peopleCount }).map(
-                  (_, personIdx) => (
-                    <div
-                      key={personIdx}
-                      className="bg-white p-4 rounded-lg mb-4 shadow-sm"
-                    >
-                      <p className="text-sm font-medium mb-3">
-                        Person {personIdx + 1}
-                      </p>
+                Copy
+              </Button>
+              <Button
+                variant={mode === "lost" ? "default" : "outline"}
+                onClick={() => setMode("lost")}
+              >
+                Reissue (Lost)
+              </Button>
+            </div>
+          </div>
 
-                      <Label className="text-sm font-semibold text-gray-700">
-                        Copies (₹50 each)
-                      </Label>
-                      <div className="flex items-center gap-2 mb-4">
-                        <Button
-                          type="button"
-                          size="icon"
-                          variant="outline"
-                          onClick={() => {
-                            const current =
-                              formData[card.id]?.[personIdx]?.copies || 1;
-                            if (current > 1) {
-                              handleCopiesChange(
-                                card.id,
-                                personIdx,
-                                current - 1
-                              );
-                            }
-                          }}
-                        >
-                          −
-                        </Button>
-                        <span className="w-8 text-center font-medium">
-                          {formData[card.id]?.[personIdx]?.copies || 1}
-                        </span>
-                        <Button
-                          type="button"
-                          size="icon"
-                          variant="outline"
-                          onClick={() => {
-                            const current =
-                              formData[card.id]?.[personIdx]?.copies || 1;
-                            if (current < 5) {
-                              handleCopiesChange(
-                                card.id,
-                                personIdx,
-                                current + 1
-                              );
-                            }
-                          }}
-                        >
-                          ＋
-                        </Button>
-                      </div>
+          <div className="space-y-2">
+            <Label>Select Card</Label>
+            <select
+              className="w-full border rounded px-2 py-2"
+              value={cardType}
+              onChange={(e) => setCardType(e.target.value)}
+            >
+              <option value="">-- Select --</option>
+              <option value="aadhaar">Aadhaar</option>
+              <option value="pan">PAN</option>
+              <option value="driving">Driving License</option>
+              <option value="voter">Voter ID</option>
+              <option value="rc">RC (Vehicle)</option>
+              <option value="ayushman">Ayushman Card</option>
+            </select>
+          </div>
 
-                      {defaultFields[card.id].map((field) => (
-                        <div key={field} className="mb-2">
-                          <Label className="capitalize">
-                            {field === "mobile" ? (
-                              <span>
-                                Mobile Number{" "}
-                                <span className="text-red-600">
-                                  (linked to card)
-                                </span>
-                              </span>
-                            ) : (
-                              field.replace(/([A-Z])/g, " $1")
-                            )}
-                          </Label>
-                          <Input
-                            placeholder={`Enter ${field}`}
-                            value={
-                              formData[card.id]?.[personIdx]?.[field] || ""
-                            }
-                            onChange={(e) =>
-                              handleFieldChange(
-                                card.id,
-                                personIdx,
-                                field,
-                                e.target.value
-                              )
-                            }
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  )
-                )}
+          <Button onClick={handleNext} className="w-full mt-4">
+            Continue
+          </Button>
+        </div>
+      )}
+
+      {step === 2 && (
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold">
+            {mode === "copy" ? "Card Copy Details" : "Reissue Details"}
+          </h2>
+
+          <div className="space-y-2">
+            <Label>Full Name</Label>
+            <Input
+              placeholder="Enter full name"
+              value={formData.fullName || ""}
+              onChange={(e) =>
+                setFormData({ ...formData, fullName: e.target.value })
+              }
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>
+              Number of Copies ({mode === "lost" ? "₹249" : "₹99"} + ₹99/copy)
+            </Label>
+            <Input
+              type="number"
+              min={1}
+              max={5}
+              value={copies}
+              onChange={(e) => setCopies(Number(e.target.value))}
+            />
+          </div>
+
+          {mode === "copy" &&
+            copyFields[cardType]?.map((field) => (
+              <div key={field} className="space-y-2">
+                <Label className="capitalize">{field}</Label>
+                <Input
+                  placeholder={`Enter ${field}`}
+                  value={formData[field] || ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, [field]: e.target.value })
+                  }
+                />
               </div>
             ))}
 
-            <div className="flex justify-between items-center text-lg font-semibold px-2 py-4 bg-green-100 rounded-lg">
-              <span>Total: </span>
-              <span className="text-green-700">₹{grandTotal}</span>
+          {mode === "lost" && lostAltField && (
+            <div className="space-y-2">
+              <Label>{lostAltField.label}</Label>
+              <Input
+                placeholder={`Enter ${lostAltField.label}`}
+                value={formData[lostAltField.key] || ""}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    [lostAltField.key]: e.target.value,
+                  })
+                }
+              />
             </div>
+          )}
 
-            <div className="flex flex-col sm:flex-row gap-4 mt-6">
-              <Button
-                variant="outline"
-                onClick={() => setStep(1)}
-                className="w-full sm:w-auto"
-              >
-                ⬅️ Back
-              </Button>
-              <Button
-                onClick={handleSubmitFinal}
-                className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white"
-                disabled={isLoading}
-              >
-                {isLoading ? "Submitting..." : "Submit Order"}
-              </Button>
-            </div>
-          </>
-        )}
-      </div>
+          <div className="space-y-2">
+            <Label>Mobile Number (linked to card)</Label>
+            <Input
+              placeholder="Enter mobile number"
+              value={formData.mobile || ""}
+              onChange={(e) =>
+                setFormData({ ...formData, mobile: e.target.value })
+              }
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Delivery Address</Label>
+            <textarea
+              className="w-full border rounded p-2"
+              rows={4}
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="Enter full shipping address"
+            />
+          </div>
+
+          <div className="flex justify-between font-semibold bg-green-100 p-3 rounded mt-4">
+            <span>Total:</span>
+            <span>₹{totalAmount}</span>
+          </div>
+
+          <div className="flex gap-3 mt-6">
+            <Button variant="outline" onClick={() => setStep(1)}>
+              ⬅ Back
+            </Button>
+            <Button onClick={handleRazorpayPayment} disabled={isLoading}>
+              {isLoading ? "Processing..." : "Pay & Submit"}
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

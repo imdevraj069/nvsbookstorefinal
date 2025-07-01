@@ -1,5 +1,3 @@
-// File: /handler/pvcOrderHandler.js
-
 import connectDB from "@/lib/dbConnect";
 import PVCOrder from "@/models/pvcOrder";
 import { getServerSession } from "next-auth";
@@ -20,31 +18,30 @@ export async function createPVCOrderHandler(body) {
     return { success: false, status: 401, error: "Unauthorized" };
   }
 
-  const { items, paymentMethod } = body;
+  const { items, paymentMethod, address, price, razorpay } = body;
 
   if (!Array.isArray(items) || items.length === 0) {
     return { success: false, status: 400, error: "No items in order" };
   }
 
-  if (paymentMethod !== "cod") {
+  if (paymentMethod !== "razorpay") {
     return {
       success: false,
       status: 400,
-      error: "Only COD is allowed currently",
+      error: "Only Razorpay payment is supported",
     };
   }
 
   try {
-    const total = items.reduce((acc, i) => acc + (i.copies || 1) * 50, 0);
-
     const createdOrder = await PVCOrder.create({
       customerId: session.user.id,
       customerName: session.user.name,
       customerEmail: session.user.email,
       customerPhone: items[0]?.details?.mobile || "",
+      address,
       items,
       paymentMethod,
-      price: total,
+      price,
     });
 
     await redis.del("pvc-orders");

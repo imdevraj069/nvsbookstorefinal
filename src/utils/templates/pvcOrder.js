@@ -20,15 +20,21 @@ export const renderUserOrderConfirmationEmail = (order) => {
             ${order.items
               .map(
                 (item) => `
-              <li>
-                <strong>${item.productType.toUpperCase()}</strong> - ${item.copies} copies<br/>
-                Mobile: ${item.details.mobile || "N/A"}
+              <li style="margin-bottom:12px;">
+                <strong>${item.productType.toUpperCase()} (${item.mode})</strong><br/>
+                Copies: ${item.copies}<br/>
+                Mobile: ${item.details.mobile || "N/A"}<br/>
+                ${Object.entries(item.details)
+                  .filter(([k]) => k !== "mobile")
+                  .map(([k, v]) => `${k}: ${v}`)
+                  .join("<br/>")}
               </li>
             `
               )
               .join("")}
           </ul>
-          <h3>Total: ₹${order.price}</h3>
+          <p><strong>Delivery Address:</strong><br/>${order.address}</p>
+          <h3 style="margin-top:20px;">Total: ₹${order.price}</h3>
         </div>
         <div style="padding:16px;text-align:center;font-size:14px;color:#666;border-top:1px solid #eee">
           <p>If you have any questions, reach us at <a href="mailto:support@example.com">support@example.com</a></p>
@@ -46,18 +52,25 @@ export const renderAdminOrderNotificationEmail = (order) => {
     <body style="margin:0;padding:0;background:#f4f4f4;font-family:sans-serif;">
       <div style="max-width:600px;margin:0 auto;padding:40px 20px;background:#ffffff;border-radius:8px;">
         <h2 style="color:#dc2626;text-align:center;">📦 New PVC Order Received</h2>
-        <p><strong>From:</strong> ${order.customerName}</p>
+        <p><strong>Customer Name:</strong> ${order.customerName}</p>
         <p><strong>Email:</strong> ${order.customerEmail}</p>
         <p><strong>Phone:</strong> ${order.customerPhone}</p>
+        <p><strong>Address:</strong><br/>${order.address}</p>
+        <p><strong>Payment:</strong> ${order.paymentMethod.toUpperCase()}</p>
         <p><strong>Total:</strong> ₹${order.price}</p>
-        <h3 style="margin-top:24px;">📑 Items:</h3>
+        <h3 style="margin-top:24px;">📑 Card Details:</h3>
         <ul style="padding-left:20px;">
           ${order.items
             .map(
               (item) => `
-            <li>
-              ${item.productType} x ${item.copies} copies
-              <br/>Mobile: ${item.details.mobile || "-"}
+            <li style="margin-bottom:14px;">
+              <strong>${item.productType.toUpperCase()} (${item.mode})</strong><br/>
+              Copies: ${item.copies}<br/>
+              Mobile: ${item.details.mobile || "-"}<br/>
+              ${Object.entries(item.details)
+                .filter(([k]) => k !== "mobile")
+                .map(([k, v]) => `${k}: ${v}`)
+                .join("<br/>")}
             </li>
           `
             )
