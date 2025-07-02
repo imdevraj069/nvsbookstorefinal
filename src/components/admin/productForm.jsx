@@ -59,6 +59,7 @@ export default function ProductForm({
     language: [],
     isbn: "",
     specifications: {},
+    date: "",
   };
 
   const [formData, setFormData] = useState(defaultFormData);
@@ -550,6 +551,13 @@ export default function ProductForm({
               />
               Featured
             </Label>
+            <Label htmlFor="date">Date</Label>
+            <Input
+              id="date"
+              type="date"
+              onChange={handleChange}
+              value={formData.date}
+            />
           </>
         );
 
