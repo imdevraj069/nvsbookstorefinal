@@ -34,7 +34,7 @@ export default function ProductCard({ product }) {
             src={image || "/placeholder.svg?height=200&width=300"}
             alt={title}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            className="object-contain group-hover:scale-105 transition-transform duration-300"
             // sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
             loading="lazy" // 👈 Optional (default is lazy)
             placeholder="blur" // Optional: blur while loading
