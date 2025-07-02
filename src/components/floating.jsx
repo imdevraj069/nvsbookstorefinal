@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import Link from "next/link";
 
 export default function FloatingSupport() {
   return (
@@ -31,18 +32,20 @@ export default function FloatingSupport() {
             </DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-1 gap-4">
-            {/* Telegram */}
+            {/* Call now */}
             <Card className="p-4 border-2 border-blue-200 hover:border-blue-400 transition-colors cursor-pointer">
               <div className="flex items-center space-x-4">
                 <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
                   <MessageCircle className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-semibold text-gray-900">Join Telegram</h4>
+                  <h4 className="font-semibold text-gray-900">Call Us</h4>
                   <p className="text-sm text-gray-600">Get instant notifications</p>
                 </div>
-                <Button size="sm" className="rounded-xl bg-blue-500 hover:bg-blue-600">
-                  Join Now
+                <Button asChild size="sm" className="rounded-xl bg-blue-500 hover:bg-blue-600">
+                  <Link href="tel:+916203662259">
+                    Call Now
+                  </Link>
                 </Button>
               </div>
             </Card>
@@ -57,8 +60,10 @@ export default function FloatingSupport() {
                   <h4 className="font-semibold text-gray-900">WhatsApp Support</h4>
                   <p className="text-sm text-gray-600">24/7 instant help</p>
                 </div>
-                <Button size="sm" className="rounded-xl bg-green-500 hover:bg-green-600">
-                  Chat Now
+                <Button asChild size="sm" className="rounded-xl bg-green-500 hover:bg-green-600">
+                  <Link href="https://wa.me/message/SXYG2DK6NQ3ZH1">
+                    Chat Now
+                  </Link>
                 </Button>
               </div>
             </Card>
@@ -73,8 +78,10 @@ export default function FloatingSupport() {
                   <h4 className="font-semibold text-gray-900">YouTube Channel</h4>
                   <p className="text-sm text-gray-600">Study tips & updates</p>
                 </div>
-                <Button size="sm" className="rounded-xl bg-red-500 hover:bg-red-600">
-                  Subscribe
+                <Button asChild size="sm" className="rounded-xl bg-red-500 hover:bg-red-600">
+                  <Link href="https://www.youtube.com/@moryatutorial507?sub_confirmation=1" target="_blank">
+                   Subscribe
+                  </Link>
                 </Button>
               </div>
             </Card>
