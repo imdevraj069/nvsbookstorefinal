@@ -17,7 +17,7 @@ export async function getProductsHandler() {
   // Fetch from MongoDB and cache
   const products = await Product.find({})
   .sort({
-    createdAt: -1
+    date: -1
   })
   .lean();
   await redis.set(cacheKey, products, { ex: 3600 });
