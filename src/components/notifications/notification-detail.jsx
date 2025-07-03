@@ -62,8 +62,8 @@ export default function NotificationDetail({ notification }) {
   }
 
   return (
-    <div className="md:flex gap-2">
-      <div className="bg-card rounded-lg border border-border p-6 mb-8">
+    <div className="md:flex gap-2 justify-center">
+      <div className="bg-card rounded-lg border border-border p-6 mb-8 max-w-[800px]">
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <Badge variant={getBadgeVariant(category.slug)}>
             {category.name}
@@ -230,7 +230,7 @@ export default function NotificationDetail({ notification }) {
           </p>
         </div>
       </div>
-      <div>advertisement here</div>
+      {/* <div>advertisement here</div> */}
     </div>
   );
 }
