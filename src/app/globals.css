@@ -171,3 +171,9 @@ html, body {
 }
 
 /* Basic editor styles */
+.mycontent img[width][height] {
+  /* honor the HTML attributes exactly */
+  max-width: 100% !important;
+  width: attr(width);
+  height: attr(height) !important;
+}
