@@ -15,6 +15,8 @@ import 'froala-editor/css/plugins.pkgd.min.css'; // All plugin styles
 import 'froala-editor/css/themes/dark.min.css';   // Optional theme
 import 'font-awesome/css/font-awesome.css';   
 
+import { Analytics } from "@vercel/analytics/next"
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -57,6 +59,7 @@ export default function RootLayout({ children }) {
               />
               <Navbar />
               {children}
+              <Analytics />
               <FloatingSupport/>
               <Footer />
             </PageTransition>
