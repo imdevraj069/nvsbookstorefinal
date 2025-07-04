@@ -9,6 +9,12 @@ import { Providers } from "@/lib/provider";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import FloatingSupport from "@/components/floating"
 
+import 'froala-editor/css/froala_editor.pkgd.min.css';
+import 'froala-editor/css/froala_style.min.css';
+import 'froala-editor/css/plugins.pkgd.min.css'; // All plugin styles
+import 'froala-editor/css/themes/dark.min.css';   // Optional theme
+import 'font-awesome/css/font-awesome.css';   
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
