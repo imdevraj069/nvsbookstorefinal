@@ -5,9 +5,8 @@ import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import toast from "react-hot-toast";
-import RichEditor from "@/utils/RichEditor";
+import FroalaEditor from "@/utils/RichEditor";
 
 const tabs = ["Basic Info", "Details", "Content", "Links", "Dates", "Settings"];
 
@@ -34,9 +33,9 @@ export default function NotificationForm({
     pdfUrl: "",
     applyUrl: "",
     websiteUrl: "",
-    loginUrl: "", // ✅ Add this
-    resultUrl: "", // ✅ Add this
-    admitCardUrl: "", // ✅ Add this
+    loginUrl: "",
+    resultUrl: "",
+    admitCardUrl: "",
     lastDate: "",
     date: "",
     isVisible: true,
@@ -48,12 +47,26 @@ export default function NotificationForm({
     fetchCategories();
   }, []);
 
+  // Update form when formData changes (for edit mode)
+  useEffect(() => {
+    if (formData) {
+      setForm(prev => ({
+        ...prev,
+        ...formData,
+        // Ensure dates are formatted correctly for input fields
+        date: formData.date ? new Date(formData.date).toISOString().split('T')[0] : "",
+        lastDate: formData.lastDate ? new Date(formData.lastDate).toISOString().split('T')[0] : "",
+      }));
+    }
+  }, [formData]);
+
   const fetchCategories = async () => {
     try {
       const res = await axios.get("/api/notification?type=category");
-      setCategories(res.data.data);
+      setCategories(res.data.data || []);
     } catch (err) {
       console.error("Failed to fetch categories", err);
+      toast.error("Failed to fetch categories");
     }
   };
 
@@ -65,15 +78,46 @@ export default function NotificationForm({
     }));
   };
 
+  const handleContentChange = (content) => {
+    setForm((prev) => ({ ...prev, content }));
+  };
+
+  const validateForm = () => {
+    if (!form.title.trim()) {
+      toast.error("Title is required");
+      setActiveTab(0);
+      return false;
+    }
+    if (!form.description.trim()) {
+      toast.error("Description is required");
+      setActiveTab(0);
+      return false;
+    }
+    if (!form.category) {
+      toast.error("Please select a category");
+      setActiveTab(1);
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    const selectedCategory = categories.find(
-      (cat) => cat._id === form.category
-    );
-    const dataToSend = { ...form, category: selectedCategory };
+    
+    if (!validateForm()) return;
 
+    setLoading(true);
+    
     try {
+      const selectedCategory = categories.find(
+        (cat) => cat._id === form.category
+      );
+      
+      const dataToSend = { 
+        ...form, 
+        category: selectedCategory || { _id: form.category, name: form.category }
+      };
+
       const res = editMode
         ? await axios.put(`/api/notification/${currentEditId}`, dataToSend)
         : await axios.post("/api/notification", { data: dataToSend });
@@ -81,21 +125,29 @@ export default function NotificationForm({
       toast.success(
         `Notification ${editMode ? "updated" : "created"} successfully`
       );
-      onSuccess(res.data.data, editMode);
+      
+      if (onSuccess) {
+        onSuccess(res.data.data, editMode);
+      }
     } catch (error) {
       console.error("Error submitting notification:", error);
-      toast.error("Failed to submit notification. Please try again.");
+      const errorMessage = error.response?.data?.message || "Failed to submit notification. Please try again.";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   const handleAddCategory = async () => {
-    if (!newCategory.trim()) return;
+    if (!newCategory.trim()) {
+      toast.error("Please enter a category name");
+      return;
+    }
+    
     setCategoryLoading(true);
     try {
       const res = await axios.post("/api/notification?type=category", {
-        data: newCategory,
+        data: newCategory.trim(),
       });
       const data = res.data.data;
       setCategories((prev) => [...prev, data]);
@@ -105,7 +157,8 @@ export default function NotificationForm({
       toast.success("Category created successfully");
     } catch (err) {
       console.error("Failed to add category:", err);
-      toast.error("Failed to add category. Please try again.");
+      const errorMessage = err.response?.data?.message || "Failed to add category. Please try again.";
+      toast.error(errorMessage);
     } finally {
       setCategoryLoading(false);
     }
@@ -115,190 +168,233 @@ export default function NotificationForm({
     switch (activeTab) {
       case 0:
         return (
-          <>
-            <Label htmlFor="title">Title</Label>
-            <Input
-              id="title"
-              required
-              onChange={handleChange}
-              value={form.title}
-              disabled={loading}
-            />
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="title">Title *</Label>
+              <Input
+                id="title"
+                required
+                onChange={handleChange}
+                value={form.title}
+                disabled={loading}
+                placeholder="Enter notification title"
+              />
+            </div>
 
-            <Label htmlFor="description">Description</Label>
-            <Input
-              id="description"
-              required
-              onChange={handleChange}
-              value={form.description}
-              disabled={loading}
-            />
-          </>
+            <div>
+              <Label htmlFor="description">Description *</Label>
+              <Input
+                id="description"
+                required
+                onChange={handleChange}
+                value={form.description}
+                disabled={loading}
+                placeholder="Enter brief description"
+              />
+            </div>
+          </div>
         );
+
       case 1:
         return (
-          <>
-            <Label htmlFor="category">Category</Label>
-            <div className="flex gap-2">
-              <select
-                id="category"
-                className="w-full rounded-md border border-input bg-background px-3 py-2"
-                onChange={handleChange}
-                value={form.category}
-                disabled={loading || categoryLoading}
-              >
-                <option value="">Select category</option>
-                {categories.map((cat) => (
-                  <option key={cat._id} value={cat._id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => setAddCategoryMode(true)}
-                disabled={loading}
-              >
-                +
-              </Button>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="category">Category *</Label>
+              <div className="flex gap-2">
+                <select
+                  id="category"
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  onChange={handleChange}
+                  value={form.category}
+                  disabled={loading || categoryLoading}
+                >
+                  <option value="">Select category</option>
+                  {categories.map((cat) => (
+                    <option key={cat._id} value={cat._id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setAddCategoryMode(true)}
+                  disabled={loading || addCategoryMode}
+                >
+                  +
+                </Button>
+              </div>
             </div>
 
             {addCategoryMode && (
-              <div className="flex gap-2 items-center">
+              <div className="flex gap-2 items-center p-3 border rounded-md bg-muted">
                 <Input
                   placeholder="New category name"
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value)}
-                  disabled={loading}
+                  disabled={categoryLoading}
                 />
                 <Button
                   type="button"
                   onClick={handleAddCategory}
                   disabled={categoryLoading}
+                  size="sm"
                 >
                   {categoryLoading ? "Adding..." : "Add"}
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setAddCategoryMode(false)}
+                  onClick={() => {
+                    setAddCategoryMode(false);
+                    setNewCategory("");
+                  }}
+                  size="sm"
                 >
                   Cancel
                 </Button>
               </div>
             )}
 
-            <Label htmlFor="department">Department</Label>
-            <Input
-              id="department"
-              onChange={handleChange}
-              value={form.department}
-              disabled={loading}
-            />
+            <div>
+              <Label htmlFor="department">Department</Label>
+              <Input
+                id="department"
+                onChange={handleChange}
+                value={form.department}
+                disabled={loading}
+                placeholder="Enter department name"
+              />
+            </div>
 
-            <Label htmlFor="location">Location</Label>
-            <Input
-              id="location"
-              onChange={handleChange}
-              value={form.location}
-              disabled={loading}
-            />
-          </>
+            <div>
+              <Label htmlFor="location">Location</Label>
+              <Input
+                id="location"
+                onChange={handleChange}
+                value={form.location}
+                disabled={loading}
+                placeholder="Enter location"
+              />
+            </div>
+          </div>
         );
+
       case 2:
         return (
-          <>
-            <RichEditor
-              content={form.content}
-              onChange={(html) =>
-                setForm((prev) => ({ ...prev, content: html }))
-              }
-            />
-          </>
+          <div className="space-y-4">
+            <Label>Content</Label>
+            <div className="relative">
+              <FroalaEditor
+                content={form.content}
+                onChange={handleContentChange}
+              />
+            </div>
+          </div>
         );
+
       case 3:
         return (
-          <>
-            <Label htmlFor="pdfUrl">PDF URL</Label>
-            <Input
-              id="pdfUrl"
-              onChange={handleChange}
-              value={form.pdfUrl}
-              disabled={loading}
-            />
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="pdfUrl">PDF URL</Label>
+              <Input
+                id="pdfUrl"
+                onChange={handleChange}
+                value={form.pdfUrl}
+                disabled={loading}
+                placeholder="https://example.com/file.pdf"
+              />
+            </div>
 
-            <Label htmlFor="applyUrl">Apply URL</Label>
-            <Input
-              id="applyUrl"
-              onChange={handleChange}
-              value={form.applyUrl}
-              disabled={loading}
-            />
+            <div>
+              <Label htmlFor="applyUrl">Apply URL</Label>
+              <Input
+                id="applyUrl"
+                onChange={handleChange}
+                value={form.applyUrl}
+                disabled={loading}
+                placeholder="https://example.com/apply"
+              />
+            </div>
 
-            <Label htmlFor="websiteUrl">Website URL</Label>
-            <Input
-              id="websiteUrl"
-              onChange={handleChange}
-              value={form.websiteUrl}
-              disabled={loading}
-            />
+            <div>
+              <Label htmlFor="websiteUrl">Website URL</Label>
+              <Input
+                id="websiteUrl"
+                onChange={handleChange}
+                value={form.websiteUrl}
+                disabled={loading}
+                placeholder="https://example.com"
+              />
+            </div>
 
-            <Label htmlFor="loginUrl">Login URL</Label>
-            <Input
-              id="loginUrl"
-              placeholder="Enter Login URL"
-              value={form.loginUrl || ""}
-              onChange={handleChange}
-              disabled={loading}
-            />
+            <div>
+              <Label htmlFor="loginUrl">Login URL</Label>
+              <Input
+                id="loginUrl"
+                placeholder="https://example.com/login"
+                value={form.loginUrl}
+                onChange={handleChange}
+                disabled={loading}
+              />
+            </div>
 
-            <Label htmlFor="resultUrl">Result URL</Label>
-            <Input
-              id="resultUrl"
-              placeholder="Enter Result URL"
-              value={form.resultUrl || ""}
-              onChange={handleChange}
-              disabled={loading}
-            />
+            <div>
+              <Label htmlFor="resultUrl">Result URL</Label>
+              <Input
+                id="resultUrl"
+                placeholder="https://example.com/result"
+                value={form.resultUrl}
+                onChange={handleChange}
+                disabled={loading}
+              />
+            </div>
 
-            <Label htmlFor="admitCardUrl">Admit Card URL</Label>
-            <Input
-              id="admitCardUrl"
-              placeholder="Enter Admit Card URL"
-              value={form.admitCardUrl || ""}
-              onChange={handleChange}
-              disabled={loading}
-            />
-          </>
+            <div>
+              <Label htmlFor="admitCardUrl">Admit Card URL</Label>
+              <Input
+                id="admitCardUrl"
+                placeholder="https://example.com/admit-card"
+                value={form.admitCardUrl}
+                onChange={handleChange}
+                disabled={loading}
+              />
+            </div>
+          </div>
         );
 
       case 4:
         return (
-          <>
-            <Label htmlFor="date">Date</Label>
-            <Input
-              id="date"
-              type="date"
-              onChange={handleChange}
-              value={form.date}
-              disabled={loading}
-            />
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="date">Date</Label>
+              <Input
+                id="date"
+                type="date"
+                onChange={handleChange}
+                value={form.date}
+                disabled={loading}
+              />
+            </div>
 
-            <Label htmlFor="lastDate">Last Date</Label>
-            <Input
-              id="lastDate"
-              type="date"
-              onChange={handleChange}
-              value={form.lastDate}
-              disabled={loading}
-            />
-          </>
+            <div>
+              <Label htmlFor="lastDate">Last Date</Label>
+              <Input
+                id="lastDate"
+                type="date"
+                onChange={handleChange}
+                value={form.lastDate}
+                disabled={loading}
+              />
+            </div>
+          </div>
         );
+
       case 5:
         return (
-          <>
+          <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <input
                 id="isVisible"
@@ -306,29 +402,37 @@ export default function NotificationForm({
                 checked={form.isVisible}
                 onChange={handleChange}
                 disabled={loading}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <Label htmlFor="isVisible">Is Visible</Label>
+              <Label htmlFor="isVisible" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Is Visible
+              </Label>
             </div>
+            
             <div className="flex items-center space-x-2">
               <input
-                id="isfeatured"
+                id="isFeatured"
                 type="checkbox"
-                checked={form.isfeatured}
+                checked={form.isFeatured}
                 onChange={handleChange}
                 disabled={loading}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <Label htmlFor="isfeatured">Is Featured</Label>
+              <Label htmlFor="isFeatured" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Is Featured
+              </Label>
             </div>
-          </>
+          </div>
         );
+
       default:
         return null;
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-white z-50 overflow-hidden flex">
-      <aside className="w-64 bg-gray-100 border-r p-4 flex flex-col space-y-2">
+    <div className="fixed inset-0 bg-white dark:bg-gray-900 z-50 overflow-hidden flex">
+      <aside className="w-64 bg-gray-100 dark:bg-gray-800 border-r p-4 flex flex-col space-y-2">
         <h2 className="text-lg font-semibold mb-2">Notification Setup</h2>
         {tabs.map((tab, index) => (
           <button
@@ -336,8 +440,8 @@ export default function NotificationForm({
             onClick={() => setActiveTab(index)}
             className={`text-left px-4 py-2 rounded-md transition ${
               activeTab === index
-                ? "bg-blue-100 font-semibold"
-                : "hover:bg-gray-200"
+                ? "bg-blue-100 dark:bg-blue-900 font-semibold text-blue-900 dark:text-blue-100"
+                : "hover:bg-gray-200 dark:hover:bg-gray-700"
             }`}
             disabled={loading || categoryLoading}
           >
@@ -360,7 +464,11 @@ export default function NotificationForm({
             >
               Cancel
             </Button>
-            <Button type="submit" form="notification-form" disabled={loading}>
+            <Button 
+              type="submit" 
+              form="notification-form" 
+              disabled={loading}
+            >
               {loading ? "Submitting..." : editMode ? "Update" : "Submit"}
             </Button>
           </div>
@@ -369,7 +477,7 @@ export default function NotificationForm({
         <form
           id="notification-form"
           onSubmit={handleSubmit}
-          className="space-y-4"
+          className="space-y-6"
         >
           {renderTabContent()}
         </form>

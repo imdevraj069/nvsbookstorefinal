@@ -92,6 +92,12 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      font-awesome:
+        specifier: ^4.7.0
+        version: 4.7.0
+      froala-editor:
+        specifier: ^4.5.2
+        version: 4.5.2
       lodash.debounce:
         specifier: ^4.0.8
         version: 4.0.8
@@ -128,6 +134,9 @@ importers:
       react-fast-marquee:
         specifier: ^1.6.5
         version: 1.6.5(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      react-froala-wysiwyg:
+        specifier: ^4.5.2
+        version: 4.5.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react-hot-toast:
         specifier: ^2.5.2
         version: 2.5.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -1347,6 +1356,10 @@ packages:
       debug:
         optional: true
 
+  font-awesome@4.7.0:
+    resolution: {integrity: sha512-U6kGnykA/6bFmg1M/oT9EkFeIYv7JlX3bozwQJWiiLz6L0w3F5vBVPxHlwyX/vtNq1ckcpRKOB9f2Qal/VtFpg==}
+    engines: {node: '>=0.10.3'}
+
   form-data@4.0.3:
     resolution: {integrity: sha512-qsITQPfmvMOSAdeyZ+12I1c+CKSstAFAwu+97zrnWAbIr5u8wfsExUzCesVLC8NgHuRUqNN4Zy6UPWUTRGslcA==}
     engines: {node: '>= 6'}
@@ -1364,6 +1377,9 @@ packages:
         optional: true
       react-dom:
         optional: true
+
+  froala-editor@4.5.2:
+    resolution: {integrity: sha512-Nkfll8jkZEtxTDO6bbmOVXHZIrH5yIO7jIDEkMc68uQjRZJwYZM+MuOhUZspDY2U1PR+kEI+o3NOymD5isizjQ==}
 
   function-bind@1.1.2:
     resolution: {integrity: sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==}
@@ -1811,6 +1827,12 @@ packages:
     peerDependencies:
       react: '>= 16.8.0 || ^18.0.0'
       react-dom: '>= 16.8.0 || ^18.0.0'
+
+  react-froala-wysiwyg@4.5.2:
+    resolution: {integrity: sha512-+x5Ua/eu0PEWi7ECAg/7lJhRg3RjDmitDZBpGHIz5DfyJyMqnp0t+cGKCG/h1yVKFn2e3CuyEwhcpOIuO8Yd+w==}
+    peerDependencies:
+      react: ~0.14 || ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+      react-dom: ~0.14 || ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
 
   react-hot-toast@2.5.2:
     resolution: {integrity: sha512-Tun3BbCxzmXXM7C+NI4qiv6lT0uwGh4oAfeJyNOjYUejTsm35mK9iCaYLGv8cBz9L5YxZLx/2ii7zsIwPtPUdw==}
@@ -3111,6 +3133,8 @@ snapshots:
 
   follow-redirects@1.15.9: {}
 
+  font-awesome@4.7.0: {}
+
   form-data@4.0.3:
     dependencies:
       asynckit: 0.4.0
@@ -3127,6 +3151,8 @@ snapshots:
     optionalDependencies:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
+
+  froala-editor@4.5.2: {}
 
   function-bind@1.1.2: {}
 
@@ -3566,6 +3592,12 @@ snapshots:
 
   react-fast-marquee@1.6.5(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+
+  react-froala-wysiwyg@4.5.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+    dependencies:
+      froala-editor: 4.5.2
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
 

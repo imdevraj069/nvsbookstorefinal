@@ -170,10 +170,206 @@ html, body {
   @apply p-2 rounded-md bg-white dark:bg-zinc-700 hover:bg-gray-200 dark:hover:bg-zinc-600 text-gray-700 dark:text-gray-100 border dark:border-zinc-600 transition relative;
 }
 
-/* Basic editor styles */
-.mycontent img[width][height] {
-  /* honor the HTML attributes exactly */
-  max-width: 100% !important;
-  width: attr(width);
-  height: attr(height) !important;
+
+
+/* Custom CSS for Froala Editor - Add this to your global.css */
+
+/* Froala Editor Custom Styles */
+.fr-wrapper {
+  border-radius: 0.75rem !important;
+  overflow: auto !important;
+}
+
+.fr-toolbar {
+  border-radius: 0.75rem 0.75rem 0 0 !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+.fr-second-toolbar {
+  border-radius: 0 !important;
+}
+
+.fr-box {
+  border-radius: 0.75rem !important;
+}
+
+.fr-element {
+  min-height: 400px !important;
+  padding: 1rem !important;
+}
+
+/* Dark theme adjustments */
+.dark .fr-wrapper {
+  background-color: #18181b !important;
+  color: #fafafa !important;
+}
+
+.dark .fr-toolbar {
+  background-color: #27272a !important;
+  border-color: #3f3f46 !important;
+}
+
+.dark .fr-element {
+  background-color: #18181b !important;
+  color: #fafafa !important;
+}
+
+.dark .fr-placeholder {
+  color: #71717a !important;
+}
+
+/* Content styling */
+.mycontent {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+.mycontent img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+}
+
+.mycontent table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+.mycontent table th,
+.mycontent table td {
+  border: 1px solid #e5e7eb;
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.mycontent table th {
+  background-color: #f9fafb;
+  font-weight: 600;
+}
+
+.dark .mycontent table th {
+  background-color: #374151;
+  border-color: #4b5563;
+}
+
+.dark .mycontent table td {
+  border-color: #4b5563;
+}
+
+.mycontent blockquote {
+  border-left: 4px solid #3b82f6;
+  padding-left: 1rem;
+  margin: 1rem 0;
+  font-style: italic;
+  color: #6b7280;
+}
+
+.dark .mycontent blockquote {
+  color: #9ca3af;
+}
+
+.mycontent ul,
+.mycontent ol {
+  padding-left: 1.5rem;
+  margin: 1rem 0;
+}
+
+.mycontent li {
+  margin: 0.25rem 0;
+}
+
+.mycontent h1,
+.mycontent h2,
+.mycontent h3,
+.mycontent h4,
+.mycontent h5,
+.mycontent h6 {
+  font-weight: 600;
+  margin: 1.5rem 0 0.5rem 0;
+}
+
+.mycontent h1 {
+  font-size: 2rem;
+}
+
+.mycontent h2 {
+  font-size: 1.5rem;
+}
+
+.mycontent h3 {
+  font-size: 1.25rem;
+}
+
+.mycontent p {
+  margin: 1rem 0;
+  line-height: 1.6;
+}
+
+.mycontent a {
+  color: #3b82f6;
+  text-decoration: underline;
+}
+
+.mycontent a:hover {
+  color: #1d4ed8;
+}
+
+.dark .mycontent a {
+  color: #60a5fa;
+}
+
+.dark .mycontent a:hover {
+  color: #93c5fd;
+}
+
+/* Responsive fixes */
+@media (max-width: 768px) {
+  .fr-toolbar {
+    flex-wrap: wrap !important;
+  }
+  
+  .fr-btn-wrap {
+    margin: 0.125rem !important;
+  }
+  
+  .fr-element {
+    min-height: 300px !important;
+  }
+}
+
+/* Loading state */
+.editor-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  background-color: #f9fafb;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+}
+
+.dark .editor-loading {
+  background-color: #18181b;
+  border-color: #3f3f46;
+}
+
+/* Error state */
+.editor-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  background-color: #fef2f2;
+  border-radius: 0.75rem;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+.dark .editor-error {
+  background-color: #1f1a1a;
+  border-color: #7f1d1d;
+  color: #f87171;
 }
