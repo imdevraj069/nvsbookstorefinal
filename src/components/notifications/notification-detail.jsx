@@ -196,6 +196,19 @@ export default function NotificationDetail({ notification }) {
             </Button>
           )}
 
+          {loginUrl && (
+            <Button variant="outline" className="bg-orange-500 hover:bg-orange-600" asChild>
+              <a
+                href={loginUrl}
+                target="_blank"
+                className="text-white hover:text-white"
+                rel="noopener noreferrer"
+              >
+                🔐 Login
+              </a>
+            </Button>
+          )}
+
           {pdfUrl && (
             <Button variant="outline" className="bg-blue-500 hover:bg-blue-600" asChild>
               <a
@@ -220,19 +233,6 @@ export default function NotificationDetail({ notification }) {
               >
                 <ExternalLink className="h-4 w-4 mr-2" />
                 Visit Official Website
-              </a>
-            </Button>
-          )}
-
-          {loginUrl && (
-            <Button variant="outline" className="bg-orange-500 hover:bg-orange-600" asChild>
-              <a
-                href={loginUrl}
-                target="_blank"
-                className="text-white hover:text-white"
-                rel="noopener noreferrer"
-              >
-                🔐 Login
               </a>
             </Button>
           )}
