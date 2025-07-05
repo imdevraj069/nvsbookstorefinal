@@ -385,6 +385,7 @@ export default function NotificationForm({
       case 4:
         return (
           <div className="space-y-4">
+            {/* Notification Date */}
             <div>
               <Label htmlFor="date">Date</Label>
               <Input
@@ -396,14 +397,33 @@ export default function NotificationForm({
               />
             </div>
 
+            {/* Last Date Toggle and Input */}
             <div>
-              <Label htmlFor="lastDate">Last Date</Label>
+              <div className="flex items-center space-x-2 mb-2">
+                <input
+                  type="checkbox"
+                  id="enableLastDate"
+                  checked={form.lastDate !== null && form.lastDate !== ""}
+                  onChange={(e) => {
+                    const isEnabled = e.target.checked;
+                    setForm((prev) => ({
+                      ...prev,
+                      lastDate: isEnabled
+                        ? new Date().toISOString().split("T")[0] // or keep "" if you want empty by default
+                        : "",
+                    }));
+                  }}
+                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <Label htmlFor="enableLastDate">Enable Last Date</Label>
+              </div>
+
               <Input
                 id="lastDate"
                 type="date"
                 onChange={handleChange}
-                value={form.lastDate}
-                disabled={loading}
+                value={form.lastDate || ""}
+                disabled={!form.lastDate || loading}
               />
             </div>
           </div>
