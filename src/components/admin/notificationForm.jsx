@@ -50,12 +50,16 @@ export default function NotificationForm({
   // Update form when formData changes (for edit mode)
   useEffect(() => {
     if (formData) {
-      setForm(prev => ({
+      setForm((prev) => ({
         ...prev,
         ...formData,
         // Ensure dates are formatted correctly for input fields
-        date: formData.date ? new Date(formData.date).toISOString().split('T')[0] : "",
-        lastDate: formData.lastDate ? new Date(formData.lastDate).toISOString().split('T')[0] : "",
+        date: formData.date
+          ? new Date(formData.date).toISOString().split("T")[0]
+          : "",
+        lastDate: formData.lastDate
+          ? new Date(formData.lastDate).toISOString().split("T")[0]
+          : "",
       }));
     }
   }, [formData]);
@@ -78,8 +82,14 @@ export default function NotificationForm({
     }));
   };
 
-  const handleContentChange = (content) => {
-    setForm((prev) => ({ ...prev, content }));
+  const handleContentChange = (rawContent) => {
+    // Remove the attribution footer from the editor output
+    const cleanedContent = rawContent.replace(
+      /<p[^>]*data-f-id=["']pbf["'][^>]*>.*?<\/p>/gi,
+      ""
+    );
+
+    setForm((prev) => ({ ...prev, content: cleanedContent }));
   };
 
   const validateForm = () => {
@@ -103,19 +113,22 @@ export default function NotificationForm({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     setLoading(true);
-    
+
     try {
       const selectedCategory = categories.find(
         (cat) => cat._id === form.category
       );
-      
-      const dataToSend = { 
-        ...form, 
-        category: selectedCategory || { _id: form.category, name: form.category }
+
+      const dataToSend = {
+        ...form,
+        category: selectedCategory || {
+          _id: form.category,
+          name: form.category,
+        },
       };
 
       const res = editMode
@@ -125,13 +138,15 @@ export default function NotificationForm({
       toast.success(
         `Notification ${editMode ? "updated" : "created"} successfully`
       );
-      
+
       if (onSuccess) {
         onSuccess(res.data.data, editMode);
       }
     } catch (error) {
       console.error("Error submitting notification:", error);
-      const errorMessage = error.response?.data?.message || "Failed to submit notification. Please try again.";
+      const errorMessage =
+        error.response?.data?.message ||
+        "Failed to submit notification. Please try again.";
       toast.error(errorMessage);
     } finally {
       setLoading(false);
@@ -143,7 +158,7 @@ export default function NotificationForm({
       toast.error("Please enter a category name");
       return;
     }
-    
+
     setCategoryLoading(true);
     try {
       const res = await axios.post("/api/notification?type=category", {
@@ -157,7 +172,9 @@ export default function NotificationForm({
       toast.success("Category created successfully");
     } catch (err) {
       console.error("Failed to add category:", err);
-      const errorMessage = err.response?.data?.message || "Failed to add category. Please try again.";
+      const errorMessage =
+        err.response?.data?.message ||
+        "Failed to add category. Please try again.";
       toast.error(errorMessage);
     } finally {
       setCategoryLoading(false);
@@ -404,11 +421,14 @@ export default function NotificationForm({
                 disabled={loading}
                 className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <Label htmlFor="isVisible" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              <Label
+                htmlFor="isVisible"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
                 Is Visible
               </Label>
             </div>
-            
+
             <div className="flex items-center space-x-2">
               <input
                 id="isFeatured"
@@ -418,7 +438,10 @@ export default function NotificationForm({
                 disabled={loading}
                 className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <Label htmlFor="isFeatured" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              <Label
+                htmlFor="isFeatured"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
                 Is Featured
               </Label>
             </div>
@@ -464,11 +487,7 @@ export default function NotificationForm({
             >
               Cancel
             </Button>
-            <Button 
-              type="submit" 
-              form="notification-form" 
-              disabled={loading}
-            >
+            <Button type="submit" form="notification-form" disabled={loading}>
               {loading ? "Submitting..." : editMode ? "Update" : "Submit"}
             </Button>
           </div>
