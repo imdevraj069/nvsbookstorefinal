@@ -120,7 +120,7 @@ export default function NotificationDetail({ notification }) {
 
   return (
     <div className="md:flex gap-2 justify-center">
-      <div className="bg-card rounded-lg border border-border p-6 mb-8 max-w-[800px] w-full">
+      <div className="bg-card rounded-lg border border-border p-6 mb-8 max-w-[1100px] w-full">
         {/* Header section */}
         <div className="flex flex-wrap items-center gap-2 mb-4">
           {category && (
