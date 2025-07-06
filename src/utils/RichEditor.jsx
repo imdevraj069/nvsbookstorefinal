@@ -1,239 +1,780 @@
-// FroalaEditor.jsx
+// TiptapEditor.jsx
 "use client";
 
-import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Link from "@tiptap/extension-link";
+import Table from "@tiptap/extension-table";
+import TableCell from "@tiptap/extension-table-cell";
+import TableHeader from "@tiptap/extension-table-header";
+import TableRow from "@tiptap/extension-table-row";
+import TextAlign from "@tiptap/extension-text-align";
+import TextStyle from "@tiptap/extension-text-style";
+import { Color } from "@tiptap/extension-color";
+import Highlight from "@tiptap/extension-highlight";
+import Underline from "@tiptap/extension-underline";
+import Superscript from "@tiptap/extension-superscript";
+import SubScript from "@tiptap/extension-subscript";
+import FontFamily from "@tiptap/extension-font-family";
+import FontSize from 'tiptap-extension-font-size';
+import CharacterCount from "@tiptap/extension-character-count";
+import React, { useCallback, useEffect, useState } from "react";
 
-// Dynamic import with better error handling
-const FroalaEditorComponent = dynamic(
-  () => import("react-froala-wysiwyg").catch(err => {
-    console.error("Failed to load Froala Editor:", err);
-    return () => <div>Editor failed to load</div>;
-  }),
-  {
-    ssr: false,
-    loading: () => <div className="p-4">Loading editor...</div>
-  }
+// Tiptap Core imports needed for custom extensions
+import { Node } from '@tiptap/core';
+import { mergeAttributes } from '@tiptap/react';
+
+// Import CSS for Tiptap and specific extensions
+import "./TiptapEditor.css";
+
+// Import Lucide React Icons
+import {
+  Bold, Italic, Underline as UnderlineIcon, Strikethrough,
+  Superscript as SuperscriptIcon, Subscript as SubscriptIcon,
+  Eraser,
+  AlignLeft, AlignCenter, AlignRight, AlignJustify,
+  List as BulletListIcon, ListOrdered as OrderedListIcon,
+  Minus, // Horizontal Rule
+  Link as LinkIcon, Link2Off,
+  Image as ImageIcon,
+  Table as TableIcon, Table2,
+  Trash2,
+  Undo, Redo,
+  Maximize, Minimize, Code, // Import Minimize icon for exiting fullscreen
+  Palette, Highlighter,
+  Font, Type,
+  Plus,
+} from "lucide-react";
+
+
+// --- EditorButton Component ---
+const EditorButton = ({ children, className = "", ...props }) => {
+  return (
+    <button
+      type="button"
+      className={`px-3 py-1 rounded text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 dark:text-gray-200 dark:bg-zinc-700 dark:hover:bg-zinc-600 flex items-center justify-center gap-1 ${className}`}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+};
+// --- End EditorButton Component ---
+
+// --- Separator Component ---
+const Separator = () => (
+  <div className="w-px bg-gray-300 dark:bg-zinc-600 mx-1 h-6 self-center"></div>
 );
+// --- End Separator Component ---
 
-let stylesLoaded = false;
+// --- Custom ImageLink Tiptap Extension ---
+const ImageLink = Node.create({
+  name: 'imageLink',
+  group: 'block',
+  draggable: true,
 
-export default function FroalaEditor({ content, onChange }) {
-  const [model, setModel] = useState(content || "");
-  const [editorReady, setEditorReady] = useState(false);
+  addAttributes() {
+    return {
+      src: {
+        default: null,
+        renderHTML: ({ src }) => {
+          if (!src) return {};
+          return { src };
+        },
+      },
+      alt: {
+        default: null,
+      },
+      title: {
+        default: null,
+      },
+      href: {
+        default: null,
+        renderHTML: ({ href }) => {
+          if (!href) return {};
+          return { href };
+        },
+      },
+      target: {
+        default: '_blank',
+        renderHTML: ({ target }) => {
+          if (!target) return {};
+          return { target };
+        },
+      },
+      rel: {
+        default: 'noopener noreferrer',
+        renderHTML: ({ rel }) => {
+          if (!rel) return {};
+          return { rel };
+        },
+      },
+      width: {
+        default: null,
+        renderHTML: ({ width }) => {
+          return width ? { width } : {};
+        },
+      },
+      height: {
+        default: null,
+        renderHTML: ({ height }) => {
+          return height ? { height } : {};
+        },
+      },
+    };
+  },
+
+  parseHTML() {
+    return [
+      {
+        tag: 'a[href] > img[src]',
+        getAttrs: (node) => {
+          const img = node.querySelector('img');
+          if (!img) return false;
+
+          return {
+            src: img.getAttribute('src'),
+            alt: img.getAttribute('alt'),
+            title: img.getAttribute('title'),
+            href: node.getAttribute('href'),
+            target: node.getAttribute('target'),
+            rel: node.getAttribute('rel'),
+            width: img.style.width || img.getAttribute('width'),
+            height: img.style.height || img.getAttribute('height'),
+          };
+        },
+      },
+      {
+        tag: 'img[src]',
+        getAttrs: (node) => {
+          return {
+            src: node.getAttribute('src'),
+            alt: node.getAttribute('alt'),
+            title: node.getAttribute('title'),
+            href: null,
+            target: null,
+            rel: null,
+            width: node.style.width || node.getAttribute('width'),
+            height: node.style.height || node.getAttribute('height'),
+          };
+        },
+      },
+    ];
+  },
+
+  renderHTML({ HTMLAttributes }) {
+    const imgAttrs = mergeAttributes({
+      src: HTMLAttributes.src,
+      alt: HTMLAttributes.alt,
+      title: HTMLAttributes.title,
+      width: HTMLAttributes.width,
+      height: HTMLAttributes.height,
+      style: `max-width: 100%; height: auto; ${HTMLAttributes.width ? `width: ${HTMLAttributes.width};` : ''} ${HTMLAttributes.height ? `height: ${HTMLAttributes.height};` : ''}`,
+      class: 'tiptap-image-node',
+    });
+
+    if (HTMLAttributes.href) {
+      return [
+        'a',
+        mergeAttributes({ href: HTMLAttributes.href, target: HTMLAttributes.target, rel: HTMLAttributes.rel }),
+        ['img', imgAttrs]
+      ];
+    }
+    return ['img', imgAttrs];
+  },
+
+  addCommands() {
+    return {
+      setImageLink:
+        (options) =>
+        ({ commands }) => {
+          return commands.insertContent({
+            type: this.name,
+            attrs: options,
+          });
+        },
+      updateImageLink:
+        (options) =>
+        ({ commands }) => {
+          return commands.updateAttributes(this.name, options);
+        },
+      unsetImageLink:
+        () =>
+        ({ commands }) => {
+          return commands.updateAttributes(this.name, { href: null, target: null, rel: null });
+        },
+      setImageSize:
+        (width, height) =>
+        ({ commands }) => {
+          return commands.updateAttributes(this.name, { width, height });
+        },
+    };
+  },
+});
+// --- End Custom ImageLink Tiptap Extension ---
+
+
+// --- Custom TableCell Tiptap Extension (for background color) ---
+const CustomTableCell = TableCell.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      backgroundColor: {
+        default: null,
+        parseHTML: element => element.style.backgroundColor || null,
+        renderHTML: attributes => {
+          return attributes.backgroundColor
+            ? { style: `background-color: ${attributes.backgroundColor}` }
+            : {};
+        },
+      },
+    };
+  },
+});
+// --- End Custom TableCell Tiptap Extension ---
+
+
+const MenuBar = ({ editor, onContentChange, toggleFullscreen, isFullscreen }) => { // Pass toggleFullscreen and isFullscreen
+  if (!editor) {
+    return null;
+  }
+
+  const handleImageUpload = useCallback(() => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = async (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+          // Replace with your actual image upload API endpoint
+          const response = await fetch("/api/upload", {
+            method: "POST",
+            body: formData,
+          });
+          const result = await response.json();
+          if (result.url) {
+            editor.chain().focus().setImageLink({ src: result.url, alt: file.name, href: '' }).run();
+            setTimeout(() => {
+              const url = window.prompt("Image URL: " + result.url + "\nEnter a link for this image (optional):");
+              if (url) {
+                editor.chain().focus().updateImageLink({ href: url, target: '_blank' }).run();
+              }
+            }, 100);
+          } else {
+            console.error("Image upload failed: No URL returned", result);
+          }
+        } catch (error) {
+          console.error("Error uploading image:", error);
+        }
+      }
+    };
+    input.click();
+  }, [editor]);
+
+  const setOrUpdateImageLink = useCallback(() => {
+    const currentAttrs = editor.getAttributes('imageLink');
+    const initialHref = currentAttrs.href || '';
+    const url = window.prompt("Enter URL for image:", initialHref);
+
+    if (url === null) return;
+
+    if (url === '') {
+      editor.chain().focus().unsetImageLink().run();
+    } else {
+      editor.chain().focus().updateImageLink({ href: url, target: '_blank', rel: 'noopener noreferrer' }).run();
+    }
+  }, [editor]);
+
+  const promptImageSize = useCallback(() => {
+    const currentAttrs = editor.getAttributes('imageLink');
+    const initialWidth = currentAttrs.width || '';
+    const initialHeight = currentAttrs.height || 'auto';
+
+    const newWidth = window.prompt("Enter image width (e.g., 300px, 50%):", initialWidth);
+    if (newWidth === null) return;
+
+    const newHeight = window.prompt("Enter image height (e.g., 200px, auto for aspect ratio):", initialHeight);
+    if (newHeight === null) return;
+
+    editor.chain().focus().setImageSize(newWidth, newHeight).run();
+  }, [editor]);
+
+  const setTableCellBackgroundColor = useCallback((color) => {
+    editor.chain().focus().setCellAttribute('backgroundColor', color).run();
+  }, [editor]);
+
+  const unsetTableCellBackgroundColor = useCallback(() => {
+    editor.chain().focus().setCellAttribute('backgroundColor', null).run();
+  }, [editor]);
+
+
+  return (
+    <div className="tiptap-menubar p-2 border-b border-gray-300 dark:border-zinc-700 flex flex-wrap gap-1 sticky top-0 bg-white dark:bg-zinc-900 z-10">
+
+      {/* --- Text Formatting Group --- */}
+      <EditorButton
+        onClick={() => editor.chain().focus().toggleBold().run()}
+        disabled={!editor.can().chain().focus().toggleBold().run()}
+        className={editor.isActive("bold") ? "is-active" : ""}
+        title="Bold"
+      >
+        <Bold size={18} />
+      </EditorButton>
+      <EditorButton
+        onClick={() => editor.chain().focus().toggleItalic().run()}
+        disabled={!editor.can().chain().focus().toggleItalic().run()}
+        className={editor.isActive("italic") ? "is-active" : ""}
+        title="Italic"
+      >
+        <Italic size={18} />
+      </EditorButton>
+      <EditorButton
+        onClick={() => editor.chain().focus().toggleUnderline().run()}
+        disabled={!editor.can().chain().focus().toggleUnderline().run()}
+        className={editor.isActive("underline") ? "is-active" : ""}
+        title="Underline"
+      >
+        <UnderlineIcon size={18} />
+      </EditorButton>
+      <EditorButton
+        onClick={() => editor.chain().focus().toggleStrike().run()}
+        disabled={!editor.can().chain().focus().toggleStrike().run()}
+        className={editor.isActive("strike") ? "is-active" : ""}
+        title="Strikethrough"
+      >
+        <Strikethrough size={18} />
+      </EditorButton>
+      <EditorButton
+        onClick={() => editor.chain().focus().toggleSuperscript().run()}
+        className={editor.isActive("superscript") ? "is-active" : ""}
+        title="Superscript"
+      >
+        <SuperscriptIcon size={18} />
+      </EditorButton>
+      <EditorButton
+        onClick={() => editor.chain().focus().toggleSubscript().run()}
+        className={editor.isActive("subscript") ? "is-active" : ""}
+        title="Subscript"
+      >
+        <SubscriptIcon size={18} />
+      </EditorButton>
+      <EditorButton
+        onClick={() => editor.chain().focus().unsetAllMarks().run()}
+        title="Clear Formatting"
+      >
+        <Eraser size={18} />
+      </EditorButton>
+
+      <Separator />
+
+      {/* --- Font & Color Group --- */}
+      <select
+        onChange={(e) => editor.chain().focus().setFontFamily(e.target.value).run()}
+        value={editor.getAttributes("textStyle").fontFamily || ""}
+        title="Font Family"
+        className="px-2 py-1 rounded text-sm font-medium text-gray-700 bg-gray-100 dark:text-gray-200 dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600"
+      >
+        <option value="">Font</option>
+        <option value="Arial">Arial</option>
+        <option value="Helvetica">Helvetica</option>
+        <option value="Times New Roman">Times New Roman</option>
+        <option value="Courier New">Courier New</option>
+        <option value="Georgia">Georgia</option>
+      </select>
+
+      <select
+        onChange={(e) => editor.chain().focus().setFontSize(e.target.value).run()}
+        value={editor.getAttributes('fontSize').fontSize || ''}
+        title="Font Size"
+        className="px-2 py-1 rounded text-sm font-medium text-gray-700 bg-gray-100 dark:text-gray-200 dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600"
+      >
+        <option value="">Size</option>
+        <option value="12px">12px</option>
+        <option value="14px">14px</option>
+        <option value="16px">16px</option>
+        <option value="18px">18px</option>
+        <option value="20px">20px</option>
+        <option value="28px">28px</option>
+        <option value="32px">32px</option>
+        <option value="36px">36px</option>
+        <option value="40px">40px</option>
+        <option value="48px">48px</option>
+        <option value="56px">56px</option>
+        <option value="60px">60px</option>
+        <option value="72px">72px</option>
+
+      </select>
+
+      <div className="flex items-center gap-1 group relative">
+        <EditorButton className="flex items-center gap-1" title="Text Color">
+          <Palette size={18} />
+          <input
+            type="color"
+            onInput={event => editor.chain().focus().setColor(event.target.value).run()}
+            value={editor.getAttributes('textStyle').color || '#000000'}
+            className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
+          />
+        </EditorButton>
+        {editor.getAttributes('textStyle').color && (
+          <EditorButton
+            onClick={() => editor.chain().focus().unsetColor().run()}
+            title="Unset Text Color"
+          >
+            <Eraser size={18} />
+          </EditorButton>
+        )}
+      </div>
+
+      <div className="flex items-center gap-1 group relative">
+        <EditorButton className="flex items-center gap-1" title="Highlight Color">
+          <Highlighter size={18} />
+          <input
+            type="color"
+            onInput={event => editor.chain().focus().setHighlight({ color: event.target.value }).run()}
+            value={editor.isActive('highlight') ? editor.getAttributes('highlight').color : '#FFFFFF'}
+            className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
+          />
+        </EditorButton>
+        {editor.isActive('highlight') && (
+          <EditorButton
+            onClick={() => editor.chain().focus().unsetHighlight().run()}
+            title="Unset Highlight"
+          >
+            <Eraser size={18} />
+          </EditorButton>
+        )}
+      </div>
+
+      <Separator />
+
+      {/* --- Block & Alignment Group --- */}
+      <select
+        onChange={(e) => {
+          if (e.target.value === "paragraph") editor.chain().focus().setParagraph().run();
+          else if (e.target.value === "blockquote") editor.chain().focus().setBlockquote().run();
+          else if (e.target.value.startsWith("h")) {
+            editor.chain().focus().toggleHeading({ level: parseInt(e.target.value.substring(1)) }).run();
+          }
+        }}
+        value={editor.isActive("paragraph") ? "paragraph" :
+               editor.isActive("blockquote") ? "blockquote" :
+               editor.isActive("heading", { level: 1 }) ? "h1" :
+               editor.isActive("heading", { level: 2 }) ? "h2" :
+               editor.isActive("heading", { level: 3 }) ? "h3" :
+               editor.isActive("heading", { level: 4 }) ? "h4" :
+               editor.isActive("heading", { level: 5 }) ? "h5" :
+               editor.isActive("heading", { level: 6 }) ? "h6" : "paragraph"}
+        title="Block Format"
+        className="px-2 py-1 rounded text-sm font-medium text-gray-700 bg-gray-100 dark:text-gray-200 dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600"
+      >
+        <option value="paragraph">Paragraph</option>
+        <option value="h1">Heading 1</option>
+        <option value="h2">Heading 2</option>
+        <option value="h3">Heading 3</option>
+        <option value="h4">Heading 4</option>
+        <option value="h5">Heading 5</option>
+        <option value="h6">Heading 6</option>
+        <option value="blockquote">Blockquote</option>
+      </select>
+
+      <EditorButton
+        onClick={() => editor.chain().focus().setTextAlign("left").run()}
+        className={editor.isActive({ textAlign: "left" }) ? "is-active" : ""}
+        title="Align Left"
+      >
+        <AlignLeft size={18} />
+      </EditorButton>
+      <EditorButton
+        onClick={() => editor.chain().focus().setTextAlign("center").run()}
+        className={editor.isActive({ textAlign: "center" }) ? "is-active" : ""}
+        title="Align Center"
+      >
+        <AlignCenter size={18} />
+      </EditorButton>
+      <EditorButton
+        onClick={() => editor.chain().focus().setTextAlign("right").run()}
+        className={editor.isActive({ textAlign: "right" }) ? "is-active" : ""}
+        title="Align Right"
+      >
+        <AlignRight size={18} />
+      </EditorButton>
+      <EditorButton
+        onClick={() => editor.chain().focus().setTextAlign("justify").run()}
+        className={editor.isActive({ textAlign: "justify" }) ? "is-active" : ""}
+        title="Align Justify"
+      >
+        <AlignJustify size={18} />
+      </EditorButton>
+
+      <Separator />
+
+      {/* --- List & Rule Group --- */}
+      <EditorButton
+        onClick={() => editor.chain().focus().toggleBulletList().run()}
+        className={editor.isActive("bulletList") ? "is-active" : ""}
+        title="Bullet List"
+      >
+        <BulletListIcon size={18} />
+      </EditorButton>
+      <EditorButton
+        onClick={() => editor.chain().focus().toggleOrderedList().run()}
+        className={editor.isActive("orderedList") ? "is-active" : ""}
+        title="Ordered List"
+      >
+        <OrderedListIcon size={18} />
+      </EditorButton>
+      <EditorButton onClick={() => editor.chain().focus().setHorizontalRule().run()} title="Horizontal Rule">
+        <Minus size={18} />
+      </EditorButton>
+
+      <Separator />
+
+      {/* --- Link & Image Group --- */}
+      <EditorButton
+        onClick={() => {
+          const url = window.prompt("Enter URL for text link:");
+          if (url) {
+            editor.chain().focus().setLink({ href: url }).run();
+          }
+        }}
+        className={editor.isActive("link") ? "is-active" : ""}
+        title="Insert Text Link"
+      >
+        <LinkIcon size={18} />
+      </EditorButton>
+      <EditorButton
+        onClick={() => editor.chain().focus().unsetLink().run()}
+        disabled={!editor.isActive("link")}
+        title="Unset Text Link"
+      >
+        <Link2Off size={18} />
+      </EditorButton>
+
+      <EditorButton onClick={handleImageUpload} title="Insert Image">
+        <ImageIcon size={18} />
+      </EditorButton>
+      {editor.isActive('imageLink') && (
+        <>
+          <EditorButton
+            onClick={setOrUpdateImageLink}
+            title="Edit Image Link"
+          >
+            <LinkIcon size={18} />
+          </EditorButton>
+          <EditorButton
+            onClick={() => editor.chain().focus().unsetImageLink().run()}
+            disabled={!editor.getAttributes('imageLink').href}
+            title="Remove Image Link"
+          >
+            <Link2Off size={18} />
+          </EditorButton>
+          <EditorButton
+            onClick={() => editor.chain().focus().setTextAlign('left').run()}
+            className={editor.isActive({ textAlign: 'left' }) ? 'is-active' : ''}
+            title="Align Image Left"
+          >
+            <AlignLeft size={18} />
+          </EditorButton>
+          <EditorButton
+            onClick={() => editor.chain().focus().setTextAlign('center').run()}
+            className={editor.isActive({ textAlign: 'center' }) ? 'is-active' : ''}
+            title="Align Image Center"
+          >
+            <AlignCenter size={18} />
+          </EditorButton>
+          <EditorButton
+            onClick={() => editor.chain().focus().setTextAlign('right').run()}
+            className={editor.isActive({ textAlign: 'right' }) ? 'is-active' : ''}
+            title="Align Image Right"
+          >
+            <AlignRight size={18} />
+          </EditorButton>
+          <EditorButton
+            onClick={promptImageSize}
+            title="Set Image Size"
+          >
+            <Type size={18} />
+          </EditorButton>
+        </>
+      )}
+
+      <Separator />
+
+      {/* --- Table Group --- */}
+      <EditorButton
+        onClick={() =>
+          editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()
+        }
+        title="Insert Table"
+      >
+        <TableIcon size={18} />
+      </EditorButton>
+      {editor.isActive('table') && (
+        <>
+          <EditorButton
+            onClick={() => editor.chain().focus().addRowAfter().run()}
+            title="Add Row After"
+          >
+            <Plus size={18} /> (Row)
+          </EditorButton>
+          <EditorButton
+            onClick={() => editor.chain().focus().deleteRow().run()}
+            title="Delete Row"
+          >
+            <Table2 size={18} /> (Del Row)
+          </EditorButton>
+          <EditorButton
+            onClick={() => editor.chain().focus().addColumnAfter().run()}
+            title="Add Column After"
+          >
+            <Plus size={18} /> (Col)
+          </EditorButton>
+          <EditorButton
+            onClick={() => editor.chain().focus().deleteColumn().run()}
+            title="Delete Column"
+          >
+            <Table2 size={18} /> (Del Col)
+          </EditorButton>
+          <EditorButton
+            onClick={() => editor.chain().focus().deleteTable().run()}
+            title="Delete Table"
+          >
+            <Trash2 size={18} /> (Table)
+          </EditorButton>
+          <div className="flex items-center gap-1 group relative">
+            <EditorButton
+              className="flex items-center gap-1"
+              title="Table Cell Background Color"
+            >
+              <Palette size={18} /> (Cell)
+              <input
+                type="color"
+                onInput={event => setTableCellBackgroundColor(event.target.value)}
+                value={editor.getAttributes('tableCell').backgroundColor || '#FFFFFF'}
+                className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
+              />
+            </EditorButton>
+            {editor.getAttributes('tableCell').backgroundColor && (
+              <EditorButton
+                onClick={unsetTableCellBackgroundColor}
+                title="Unset Table Cell Background Color"
+              >
+                <Eraser size={18} /> (Cell)
+              </EditorButton>
+            )}
+          </div>
+        </>
+      )}
+
+      <Separator />
+
+      {/* --- Undo/Redo & Utilities Group --- */}
+      <EditorButton
+        onClick={() => editor.chain().focus().undo().run()}
+        disabled={!editor.can().chain().focus().undo().run()}
+        title="Undo"
+      >
+        <Undo size={18} />
+      </EditorButton>
+      <EditorButton
+        onClick={() => editor.chain().focus().redo().run()}
+        disabled={!editor.can().chain().focus().redo().run()}
+        title="Redo"
+      >
+        <Redo size={18} />
+      </EditorButton>
+
+      <EditorButton
+        onClick={toggleFullscreen} // Call the toggleFullscreen function
+        title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"} // Change title based on state
+      >
+        {isFullscreen ? <Minimize size={18} /> : <Maximize size={18} />} {/* Change icon */}
+      </EditorButton>
+      <EditorButton onClick={() => alert(`HTML Content:\n\n${editor.getHTML()}`)} title="View HTML">
+        <Code size={18} />
+      </EditorButton>
+
+      <div className="char-count mt-2 text-right w-full text-sm text-gray-500">
+        Characters: {editor.storage.characterCount.characters()} / Words: {editor.storage.characterCount.words()}
+      </div>
+    </div>
+  );
+};
+
+export default function TiptapEditor({ content, onChange }) {
+  const [isFullscreen, setIsFullscreen] = useState(false); // State for fullscreen mode
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        bold: true,
+        italic: true,
+        strike: true,
+        blockquote: true,
+        bulletList: true,
+        orderedList: true,
+        horizontalRule: true,
+        heading: {
+          levels: [1, 2, 3, 4, 5, 6],
+        },
+        image: false,
+      }),
+      Underline,
+      Superscript,
+      SubScript,
+      Link.configure({
+        openOnClick: false,
+        autolink: true,
+      }),
+      ImageLink,
+      Table.configure({
+        resizable: true,
+      }),
+      CustomTableCell,
+      TableHeader,
+      TableRow,
+      TextAlign.configure({
+        types: ["heading", "paragraph", "imageLink"],
+      }),
+      TextStyle,
+      Color.configure({
+        types: ["textStyle"],
+      }),
+      Highlight.configure({
+        multicolor: true,
+      }),
+      FontFamily.configure({
+        types: ["textStyle"],
+      }),
+      FontSize,
+      CharacterCount,
+    ],
+    content: content || "<p>Start typing...</p>",
+    onUpdate: ({ editor }) => {
+      onChange && onChange(editor.getHTML());
+    },
+    editorProps: {
+      attributes: {
+        class: "prose dark:prose-invert max-w-none p-4 outline-none min-h-[400px]",
+      },
+    },
+  });
 
   useEffect(() => {
-    if (!stylesLoaded && typeof window !== "undefined") {
-      try {
-        // Load Froala scripts
-        require("froala-editor/js/froala_editor.pkgd.min.js");
-        require("froala-editor/js/plugins/align.min.js");
-        require("froala-editor/js/plugins/code_view.min.js");
-        require("froala-editor/js/plugins/colors.min.js");
-        require("froala-editor/js/plugins/font_size.min.js");
-        require("froala-editor/js/plugins/font_family.min.js");
-        require("froala-editor/js/plugins/paragraph_style.min.js");
-        require("froala-editor/js/plugins/table.min.js");
-        require("froala-editor/js/plugins/image.min.js");
-        require("froala-editor/js/plugins/link.min.js");
-        require("froala-editor/js/plugins/fullscreen.min.js");
-        require("froala-editor/js/plugins/lists.min.js");
-        require("froala-editor/js/plugins/paragraph_format.min.js");
-
-        // Load Froala styles
-        require("froala-editor/css/froala_editor.pkgd.min.css");
-        require("froala-editor/css/froala_style.min.css");
-        require("froala-editor/css/themes/dark.min.css");
-        require("font-awesome/css/font-awesome.css");
-
-        stylesLoaded = true;
-        setEditorReady(true);
-      } catch (error) {
-        console.error("Failed to load Froala resources:", error);
-      }
-    } else if (stylesLoaded) {
-      setEditorReady(true);
+    if (editor && content !== editor.getHTML()) {
+      editor.commands.setContent(content || "");
     }
+  }, [content, editor]);
+
+  const toggleFullscreen = useCallback(() => {
+    setIsFullscreen((prev) => !prev);
   }, []);
 
-  // useEffect(() => {
-  //   if (content !== model) {
-  //     setModel(content || "");
-  //   }
-  // }, [content]);
-
-  const handleModelChange = (newContent) => {
-    setModel(newContent);
-    if (onChange) {
-      onChange(newContent);
-    }
-  };
-
-  const config = {
-    theme: "dark",
-    heightMin: 400,
-    heightMax: 800,
-    placeholderText: "Start typing...",
-    charCounterCount: true,
-    toolbarSticky: true,
-    imageUpload: true,
-    imageUploadURL: "/api/upload",
-    imageAllowedTypes: ["jpeg", "jpg", "png", "gif", "webp"],
-    imageMaxSize: 5 * 1024 * 1024, // 5MB
-    
-    // Enhanced z-index settings to fix toolbar visibility
-    zIndex: 1000,
-    imageInlineToolbarInside: false,
-    
-    events: {
-      "image.inserted": function () {
-        this.events.focus(true);
-        const images = this.$el.find("img.fr-dii, img.fr-dib");
-        if (images.length > 0) {
-          this.selection.setAtStart(images.last()[0]);
-          this.selection.restore();
-        }
-      },
-      "image.uploaded": function (response) {
-        try {
-          const json = JSON.parse(response);
-          if (json.url) {
-            this.image.insert(json.url, null, null, this.image.get());
-          }
-        } catch (err) {
-          console.error("Image upload parse error:", err);
-        }
-        return false;
-      },
-      "image.error": function (error, response) {
-        console.error("Image upload error:", error, response);
-      },
-      "image.focused": function ($img) {
-        // Force toolbar to be visible with higher z-index
-        setTimeout(() => {
-          const toolbar = this.$tb;
-          if (toolbar) {
-            toolbar.css('z-index', '10000');
-          }
-          // Also fix inline toolbar z-index
-          const inlineToolbar = this.$box.find('.fr-toolbar.fr-inline');
-          if (inlineToolbar.length) {
-            inlineToolbar.css('z-index', '10000');
-          }
-        }, 100);
-        this.toolbar.showInline();
-      },
-      "initialized": function () {
-        console.log("Froala Editor initialized");
-        
-        // Add custom CSS for better toolbar visibility
-        const style = document.createElement('style');
-        style.textContent = `
-          .fr-toolbar.fr-inline {
-            z-index: 10000 !important;
-            position: relative !important;
-          }
-          .fr-popup {
-            z-index: 10001 !important;
-          }
-          .fr-image-resizer {
-            z-index: 9999 !important;
-          }
-          /* Enhanced table resizing */
-          .fr-table-resizer {
-            background: #1976d2 !important;
-            cursor: col-resize !important;
-          }
-          .fr-table-resizer.fr-horizontal {
-            cursor: row-resize !important;
-          }
-          /* Better cell selection visibility */
-          .fr-selected-cell {
-            background-color: rgba(25, 118, 210, 0.1) !important;
-            border: 2px solid #1976d2 !important;
-          }
-        `;
-        document.head.appendChild(style);
-      },
-      "table.inserted": function () {
-        // Table resizing is handled automatically by tableResizer config
-        console.log("Table inserted with resizing enabled");
-      }
-    },
-    
-    htmlAllowTags: [
-      "a", "img", "p", "div", "span", "br", "strong", "em", "u", "s", 
-      "h1", "h2", "h3", "h4", "h5", "h6", "ul", "ol", "li", "table", 
-      "thead", "tbody", "tr", "td", "th", "blockquote", "hr"
-    ],
-    htmlAllowedAttrs: [
-      "href", "src", "alt", "style", "class", "width", "height", 
-      "target", "title", "data-*", "id", "colspan", "rowspan"
-    ],
-    
-    // Enhanced image settings
-    imageDefaultAlign: "center",
-    imageDefaultDisplay: "block",
-    imageResizeWithPercent: true,
-    imageMultipleStyles: false,
-    imageEditButtons: [
-      "imageReplace", "imageAlign", "imageRemove",
-      "|", "imageLink", "linkOpen", "linkEdit", "linkRemove",
-      "-", "imageDisplay", "imageStyle", "imageAlt", "imageSize"
-    ],
-    
-    // Enhanced table settings with resizing and cell background
-    tableStyles: {
-      'fr-table-borders': 'Borders',
-      'fr-table-gray-1': 'Gray 1',
-      'fr-table-gray-2': 'Gray 2',
-      'fr-table-red-1': 'Red 1',
-      'fr-table-red-2': 'Red 2',
-      'fr-table-blue-1': 'Blue 1',
-      'fr-table-blue-2': 'Blue 2'
-    },
-    tableCellStyles: {
-      'fr-highlighted': 'Highlighted',
-      'fr-thick-border': 'Thick Border'
-    },
-    tableColorsButtons: [
-      'tableColorRemove', '|',
-      'tableColorRed', 'tableColorOrange', 'tableColorYellow', 'tableColorGreen',
-      'tableColorBlue', 'tableColorGray', '|',
-      'tableColorPurple', 'tableColorPink', 'tableColorCyan'
-    ],
-    tableEditButtons: [
-      "tableHeader", "tableRemove",
-      "|", "tableRows", "tableColumns",
-      "|", "tableCellBackground", "tableCellVerticalAlign", "tableCellHorizontalAlign",
-      "|", "tableCellStyle", "tableStyle"
-    ],
-    tableResizer: true,
-    tableResizerOffset: 5,
-    tableResizingLimit: 30,
-    
-    toolbarButtons: [
-      "bold", "italic", "underline", "strikeThrough", "subscript", "superscript",
-      "|", "fontFamily", "fontSize", "textColor", "backgroundColor", "clearFormatting",
-      "|", "paragraphFormat", "paragraphStyle", "quote",
-      "|", "alignLeft", "alignCenter", "alignRight", "alignJustify",
-      "|", "formatOL", "formatUL", "insertHR",
-      "|", "insertLink", "insertImage", "insertTable",
-      "|", "undo", "redo", "fullscreen", "html"
-    ],
-    toolbarButtonsXS: [
-      "bold", "italic", "underline", "|", "alignLeft", "alignCenter", "alignRight", 
-      "|", "insertLink", "insertImage", "|", "undo", "redo"
-    ],
-    toolbarButtonsSM: [
-      "bold", "italic", "underline", "strikeThrough", "|", "fontFamily", "fontSize", 
-      "|", "alignLeft", "alignCenter", "alignRight", "|", "formatOL", "formatUL", 
-      "|", "insertLink", "insertImage", "insertTable", "|", "undo", "redo", "fullscreen"
-    ],
-    toolbarButtonsMD: "toolbarButtons",
-  };
-
-  if (!editorReady) {
+  if (!editor) {
     return (
       <div className="border rounded-xl overflow-hidden bg-white dark:bg-zinc-900 min-h-[500px] flex items-center justify-center">
         <div className="text-center">
@@ -245,13 +786,15 @@ export default function FroalaEditor({ content, onChange }) {
   }
 
   return (
-    <div className="border rounded-xl overflow-hidden bg-white dark:bg-zinc-900 min-h-[500px] relative">
-      <FroalaEditorComponent
-        tag="textarea"
-        model={model}
-        onModelChange={handleModelChange}
-        config={config}
-      />
+    <div
+      className={`border rounded-xl bg-white dark:bg-zinc-900 min-h-[500px] max-h-[700px] flex flex-col overflow-hidden ${
+        isFullscreen ? "tiptap-fullscreen" : "" // Apply fullscreen class conditionally
+      }`}
+    >
+      <div className="flex flex-col flex-grow overflow-y-auto relative">
+        <MenuBar editor={editor} toggleFullscreen={toggleFullscreen} isFullscreen={isFullscreen} /> {/* Pass props to MenuBar */}
+        <EditorContent editor={editor} className="flex-grow" />
+      </div>
     </div>
   );
 }

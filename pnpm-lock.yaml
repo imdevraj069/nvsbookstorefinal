@@ -35,9 +35,15 @@ importers:
       '@radix-ui/react-slot':
         specifier: ^1.2.3
         version: 1.2.3(@types/react@19.1.8)(react@19.1.0)
+      '@tiptap/extension-character-count':
+        specifier: ^2.24.2
+        version: 2.24.2(@tiptap/core@2.23.0(@tiptap/pm@2.23.0))(@tiptap/pm@2.23.0)
       '@tiptap/extension-color':
         specifier: ^2.23.0
         version: 2.23.0(@tiptap/core@2.23.0(@tiptap/pm@2.23.0))(@tiptap/extension-text-style@2.23.0(@tiptap/core@2.23.0(@tiptap/pm@2.23.0)))
+      '@tiptap/extension-font-family':
+        specifier: ^2.24.2
+        version: 2.24.2(@tiptap/core@2.23.0(@tiptap/pm@2.23.0))(@tiptap/extension-text-style@2.23.0(@tiptap/core@2.23.0(@tiptap/pm@2.23.0)))
       '@tiptap/extension-highlight':
         specifier: ^2.23.0
         version: 2.23.0(@tiptap/core@2.23.0(@tiptap/pm@2.23.0))
@@ -47,6 +53,12 @@ importers:
       '@tiptap/extension-link':
         specifier: ^2.23.0
         version: 2.23.0(@tiptap/core@2.23.0(@tiptap/pm@2.23.0))(@tiptap/pm@2.23.0)
+      '@tiptap/extension-subscript':
+        specifier: ^2.24.2
+        version: 2.24.2(@tiptap/core@2.23.0(@tiptap/pm@2.23.0))
+      '@tiptap/extension-superscript':
+        specifier: ^2.24.2
+        version: 2.24.2(@tiptap/core@2.23.0(@tiptap/pm@2.23.0))
       '@tiptap/extension-table':
         specifier: ^2.23.0
         version: 2.23.0(@tiptap/core@2.23.0(@tiptap/pm@2.23.0))(@tiptap/pm@2.23.0)
@@ -165,6 +177,9 @@ importers:
       '@tailwindcss/postcss':
         specifier: ^4
         version: 4.1.10
+      '@tailwindcss/typography':
+        specifier: ^0.5.16
+        version: 0.5.16(tailwindcss@4.1.10)
       '@types/node':
         specifier: ^20
         version: 20.19.1
@@ -984,6 +999,11 @@ packages:
   '@tailwindcss/postcss@4.1.10':
     resolution: {integrity: sha512-B+7r7ABZbkXJwpvt2VMnS6ujcDoR2OOcFaqrLIo1xbcdxje4Vf+VgJdBzNNbrAjBj/rLZ66/tlQ1knIGNLKOBQ==}
 
+  '@tailwindcss/typography@0.5.16':
+    resolution: {integrity: sha512-0wDLwCVF5V3x3b1SGXPCDcdsbDHMBe+lkFzBRaHeLvNi+nrrnZ1lA18u+OTWO8iSWU2GxUOCvlXtDuqftc1oiA==}
+    peerDependencies:
+      tailwindcss: '>=3.0.0 || insiders || >=4.0.0-alpha.20 || >=4.0.0-beta.1'
+
   '@tiptap/core@2.23.0':
     resolution: {integrity: sha512-Cdfhd0Po1cKMYqHtyv/3XATXpf2Kjo8fuau/QJwrml0NpM18/XX9mAgp2NJ/QaiQ3vi8vDandg7RmZ5OrApglQ==}
     peerDependencies:
@@ -1009,6 +1029,12 @@ packages:
     resolution: {integrity: sha512-YrmH5AVSkpCQ7k1Orm8hlzDeUO7rxpQkS51sr2w+ruruKIun/X6V0phuLee+f7DBrzHenBcuU6gBtU6vgGPYFw==}
     peerDependencies:
       '@tiptap/core': ^2.7.0
+
+  '@tiptap/extension-character-count@2.24.2':
+    resolution: {integrity: sha512-DNlxYlxq6yJj16ew1kcQ/08Iy77IuizHkDjQzPAKKIvJLeqP6nj6kj9J6SFxTQmgoP+pJYkMyOn6f6na99H0HA==}
+    peerDependencies:
+      '@tiptap/core': ^2.7.0
+      '@tiptap/pm': ^2.7.0
 
   '@tiptap/extension-code-block@2.23.0':
     resolution: {integrity: sha512-p8iizp5nQBBhYPrIgBVwEqcDnc2fFRAZCXy/xjmAk2kKOhB7NYe3+1yrbFcQKVAdaUFxG+BRj2WxNDeeRt5tJA==}
@@ -1043,6 +1069,12 @@ packages:
     peerDependencies:
       '@tiptap/core': ^2.7.0
       '@tiptap/pm': ^2.7.0
+
+  '@tiptap/extension-font-family@2.24.2':
+    resolution: {integrity: sha512-La7gCAxndNc3/vnDJsxXlCAWRvfRJXo38wU5UABbG6AQfvpvJk+eGYgiu6o3zicFwnjka0JuxGys1H4m+QfgWg==}
+    peerDependencies:
+      '@tiptap/core': ^2.7.0
+      '@tiptap/extension-text-style': ^2.7.0
 
   '@tiptap/extension-gapcursor@2.23.0':
     resolution: {integrity: sha512-SpYsDtMiVwqcSB84g714PrnHo985R5UiIaGngef6iMNy/0xjKcO0tj/feu0WwJDuSj22Opzlnb/Ld/D4Va27Ng==}
@@ -1110,6 +1142,16 @@ packages:
 
   '@tiptap/extension-strike@2.23.0':
     resolution: {integrity: sha512-zdYO4xdg15BE8gmPYFgA5Xn5+hPA6NAiDBWxv5KNWD9cJ5OhsJx2OsfSCWc0CxYQaIIbHhGM9EGzqH5lF+UnwQ==}
+    peerDependencies:
+      '@tiptap/core': ^2.7.0
+
+  '@tiptap/extension-subscript@2.24.2':
+    resolution: {integrity: sha512-cLEf0gyyXm9kSZRwjFElxDebRJ1yvhKSjNNBGgOA4cr4uGw+6hSfuK0ZvGLGpkXnz+NPDW+58ZUejny6p3Ztfw==}
+    peerDependencies:
+      '@tiptap/core': ^2.7.0
+
+  '@tiptap/extension-superscript@2.24.2':
+    resolution: {integrity: sha512-Tl5z3D0cAFOMmUT0uUU1/uAqGc3P5kaeYkVQ4cTXDv/95OHGqftI9jcVlIBHV6yAqzlQ/QeNO60h6kBuF5mBaQ==}
     peerDependencies:
       '@tiptap/core': ^2.7.0
 
@@ -1308,6 +1350,11 @@ packages:
 
   crelt@1.0.6:
     resolution: {integrity: sha512-VQ2MBenTq1fWZUH9DJNGti7kKv6EeAuYr3cLwxUWhIu1baTaXh4Ib5W2CqHVqib4/MqbYGJqiL3Zb8GJZr3l4g==}
+
+  cssesc@3.0.0:
+    resolution: {integrity: sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==}
+    engines: {node: '>=4'}
+    hasBin: true
 
   csstype@3.1.3:
     resolution: {integrity: sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==}
@@ -1548,8 +1595,17 @@ packages:
   linkifyjs@4.3.1:
     resolution: {integrity: sha512-DRSlB9DKVW04c4SUdGvKK5FR6be45lTU9M76JnngqPeeGDqPwYc0zdUErtsNVMtxPXgUWV4HbXbnC4sNyBxkYg==}
 
+  lodash.castarray@4.4.0:
+    resolution: {integrity: sha512-aVx8ztPv7/2ULbArGJ2Y42bG1mEQ5mGjpdvrbJcJFU3TbYybe+QlLS4pst9zV52ymy2in1KpFPiZnAOATxD4+Q==}
+
   lodash.debounce@4.0.8:
     resolution: {integrity: sha512-FT1yDzDYEoYWhnSGnpE/4Kj1fLZkDFyqRb7fNt6FdYOSxlUWAtp42Eh6Wb0rGIv/m9Bgo7x4GhQbm5Ys4SG5ow==}
+
+  lodash.isplainobject@4.0.6:
+    resolution: {integrity: sha512-oSXzaWypCMHkPC3NvBEaPHf0KsA5mvPrOPgQWDsbg8n7orZ290M0BmC/jgRZ4vcJ6DTAhjrsSYgdsW/F+MFOBA==}
+
+  lodash.merge@4.6.2:
+    resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
 
   lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
@@ -1746,6 +1802,10 @@ packages:
   picomatch@2.3.1:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
     engines: {node: '>=8.6'}
+
+  postcss-selector-parser@6.0.10:
+    resolution: {integrity: sha512-IQ7TZdoaqbT+LCpShg46jnZVlhWD2w6iQYAcYXfHARZ7X1t/UGhhceQDs5X0cGqKvYlHNOuv7Oa1xmb0oQuA3w==}
+    engines: {node: '>=4'}
 
   postcss@8.4.31:
     resolution: {integrity: sha512-PS08Iboia9mts/2ygV3eLpY5ghnUcfLV/EXTOW1E2qYxJKGGBUtNjN76FYHnMs36RmARn41bC0AZmn+rR0OVpQ==}
@@ -2049,6 +2109,9 @@ packages:
     resolution: {integrity: sha512-Rb46I4cGGVBmjamjphe8L/UnvJD+uPPtTkNvX5mZgqdbavhI4EbgIWJiIHXJ8bc/i9EQGPRh4DwEURJ552Do0A==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
+  util-deprecate@1.0.2:
+    resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
   uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
@@ -2794,6 +2857,14 @@ snapshots:
       postcss: 8.5.6
       tailwindcss: 4.1.10
 
+  '@tailwindcss/typography@0.5.16(tailwindcss@4.1.10)':
+    dependencies:
+      lodash.castarray: 4.4.0
+      lodash.isplainobject: 4.0.6
+      lodash.merge: 4.6.2
+      postcss-selector-parser: 6.0.10
+      tailwindcss: 4.1.10
+
   '@tiptap/core@2.23.0(@tiptap/pm@2.23.0)':
     dependencies:
       '@tiptap/pm': 2.23.0
@@ -2815,6 +2886,11 @@ snapshots:
   '@tiptap/extension-bullet-list@2.23.0(@tiptap/core@2.23.0(@tiptap/pm@2.23.0))':
     dependencies:
       '@tiptap/core': 2.23.0(@tiptap/pm@2.23.0)
+
+  '@tiptap/extension-character-count@2.24.2(@tiptap/core@2.23.0(@tiptap/pm@2.23.0))(@tiptap/pm@2.23.0)':
+    dependencies:
+      '@tiptap/core': 2.23.0(@tiptap/pm@2.23.0)
+      '@tiptap/pm': 2.23.0
 
   '@tiptap/extension-code-block@2.23.0(@tiptap/core@2.23.0(@tiptap/pm@2.23.0))(@tiptap/pm@2.23.0)':
     dependencies:
@@ -2844,6 +2920,11 @@ snapshots:
       '@tiptap/core': 2.23.0(@tiptap/pm@2.23.0)
       '@tiptap/pm': 2.23.0
       tippy.js: 6.3.7
+
+  '@tiptap/extension-font-family@2.24.2(@tiptap/core@2.23.0(@tiptap/pm@2.23.0))(@tiptap/extension-text-style@2.23.0(@tiptap/core@2.23.0(@tiptap/pm@2.23.0)))':
+    dependencies:
+      '@tiptap/core': 2.23.0(@tiptap/pm@2.23.0)
+      '@tiptap/extension-text-style': 2.23.0(@tiptap/core@2.23.0(@tiptap/pm@2.23.0))
 
   '@tiptap/extension-gapcursor@2.23.0(@tiptap/core@2.23.0(@tiptap/pm@2.23.0))(@tiptap/pm@2.23.0)':
     dependencies:
@@ -2899,6 +2980,14 @@ snapshots:
       '@tiptap/core': 2.23.0(@tiptap/pm@2.23.0)
 
   '@tiptap/extension-strike@2.23.0(@tiptap/core@2.23.0(@tiptap/pm@2.23.0))':
+    dependencies:
+      '@tiptap/core': 2.23.0(@tiptap/pm@2.23.0)
+
+  '@tiptap/extension-subscript@2.24.2(@tiptap/core@2.23.0(@tiptap/pm@2.23.0))':
+    dependencies:
+      '@tiptap/core': 2.23.0(@tiptap/pm@2.23.0)
+
+  '@tiptap/extension-superscript@2.24.2(@tiptap/core@2.23.0(@tiptap/pm@2.23.0))':
     dependencies:
       '@tiptap/core': 2.23.0(@tiptap/pm@2.23.0)
 
@@ -3113,6 +3202,8 @@ snapshots:
 
   crelt@1.0.6: {}
 
+  cssesc@3.0.0: {}
+
   csstype@3.1.3: {}
 
   debug@4.4.1:
@@ -3301,7 +3392,13 @@ snapshots:
 
   linkifyjs@4.3.1: {}
 
+  lodash.castarray@4.4.0: {}
+
   lodash.debounce@4.0.8: {}
+
+  lodash.isplainobject@4.0.6: {}
+
+  lodash.merge@4.6.2: {}
 
   lodash@4.17.21: {}
 
@@ -3480,6 +3577,11 @@ snapshots:
 
   picomatch@2.3.1:
     optional: true
+
+  postcss-selector-parser@6.0.10:
+    dependencies:
+      cssesc: 3.0.0
+      util-deprecate: 1.0.2
 
   postcss@8.4.31:
     dependencies:
@@ -3811,6 +3913,8 @@ snapshots:
   use-sync-external-store@1.5.0(react@19.1.0):
     dependencies:
       react: 19.1.0
+
+  util-deprecate@1.0.2: {}
 
   uuid@8.3.2: {}
 

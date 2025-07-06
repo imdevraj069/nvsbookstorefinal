@@ -1,0 +1,446 @@
+/* TiptapEditor.css */
+
+/* Basic reset and box-sizing for consistency */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Base styles for the editor container */
+.tiptap-editor-container {
+  border: 1px solid #e2e8f0; /* Light gray border */
+  border-radius: 0.75rem; /* rounded-xl */
+  overflow: hidden;
+  background-color: #ffffff; /* bg-white */
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for the container */
+}
+
+.dark .tiptap-editor-container {
+  background-color: #18181b; /* dark:bg-zinc-900 */
+  border-color: #3f3f46; /* dark:border-zinc-700 */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Tiptap Menu Bar Styling */
+.tiptap-menubar {
+  border-bottom: 1px solid #cbd5e0; /* border-gray-300 */
+  background-color: #ffffff; /* bg-white */
+  padding: 0.75rem 1rem; /* p-3 p-4, slightly more generous padding */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem; /* Increased gap for better spacing */
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Subtle shadow for sticky bar */
+}
+
+.dark .tiptap-menubar {
+  border-color: #3f3f46; /* dark:border-zinc-700 */
+  background-color: #18181b; /* dark:bg-zinc-900 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Editor Button Styling */
+.tiptap-menubar button {
+  padding: 0.5rem 0.75rem; /* Adjusted padding */
+  border-radius: 0.375rem; /* slightly more rounded corners */
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4a5568; /* text-gray-700 */
+  background-color: #f3f4f6; /* bg-gray-100 */
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid transparent; /* Subtle border for definition */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem; /* gap-1.5 for slight increase */
+  cursor: pointer;
+  outline: none; /* No default outline */
+}
+
+.tiptap-menubar button:hover:not(:disabled) {
+  background-color: #e5e7eb; /* bg-gray-200 */
+  color: #333; /* Slightly darker text on hover */
+  border-color: #d1d5db; /* A subtle hover border */
+}
+
+.tiptap-menubar button:active:not(:disabled) {
+  background-color: #d1d5db; /* bg-gray-300 */
+  border-color: #9ca3af;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1); /* Inset shadow for press effect */
+}
+
+.tiptap-menubar button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #f9fafb; /* Lighter disabled state */
+  color: #9ca3af; /* Muted text */
+  box-shadow: none;
+}
+
+/* Dark Mode Button Styling */
+.dark .tiptap-menubar button {
+  color: #d4d4d8; /* dark:text-gray-200 */
+  background-color: #3f3f46; /* dark:bg-zinc-700 */
+  border-color: transparent;
+}
+
+.dark .tiptap-menubar button:hover:not(:disabled) {
+  background-color: #52525b; /* dark:bg-zinc-600 */
+  color: #f3f4f6; /* Lighter text on hover */
+  border-color: #71717a;
+}
+
+.dark .tiptap-menubar button:active:not(:disabled) {
+  background-color: #27272a; /* dark:bg-zinc-800 */
+  border-color: #52525b;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.dark .tiptap-menubar button:disabled {
+  background-color: #27272a; /* Darker disabled state */
+  color: #71717a; /* Muted text */
+}
+
+
+/* Style for active menu buttons */
+.tiptap-menubar .is-active {
+  background-color: #3b82f6 !important; /* bg-blue-500, important to override hover */
+  color: #ffffff !important; /* text-white */
+  border-color: #2563eb !important; /* border-blue-600 */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15); /* Small shadow for active */
+}
+
+.dark .tiptap-menubar .is-active {
+  background-color: #60a5fa !important; /* dark:bg-blue-400 */
+  color: #1f2937 !important; /* dark:text-gray-900 */
+  border-color: #3b82f6 !important; /* dark:border-blue-500 */
+}
+
+/* Style for select dropdowns in the menubar */
+.tiptap-menubar select {
+  border: 1px solid #cbd5e0; /* border-gray-300 */
+  background-color: #f3f4f6; /* bg-gray-100 */
+  color: #4a5568; /* text-gray-700 */
+  padding: 0.5rem 2rem 0.5rem 0.75rem; /* Adjusted padding */
+  border-radius: 0.375rem; /* slightly more rounded corners */
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  appearance: none;
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%20viewBox%3D%220%200%20292.4%20292.4%22%3E%3Cpath%20fill%3D%22%234a5568%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.2-5.6H18.6c-5%200-9.3%201.8-13.2%205.6C1.8%2073.3%200%2077.5%200%2082.5c0%205%201.8%209.3%205.6%2013.2L139.2%20216.7c3.9%203.9%208.2%205.6%2013.2%205.6s9.3-1.8%2013.2-5.6L287%2095.7c3.9-3.9%205.6-8.2%205.6-13.2%200-5-1.8-9.3-5.6-13.1z%22%2F%3E%3C%2Fsvg%3E');
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center; /* Adjusted for new padding */
+  background-size: 0.75rem auto;
+  min-width: 5rem; /* Give selects a minimum width */
+}
+
+.dark .tiptap-menubar select {
+  border-color: #52525B; /* dark:border-zinc-600 */
+  background-color: #3f3f46; /* dark:bg-zinc-700 */
+  color: #d4d4d8; /* dark:text-gray-200 */
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%20viewBox%3D%220%200%20292.4%20292.4%22%3E%3Cpath%20fill%3D%22%23d4d4d8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.2-5.6H18.6c-5%200-9.3%201.8-13.2%205.6C1.8%2073.3%200%2077.5%200%2082.5c0%205%201.8%209.3%205.6%2013.2L139.2%20216.7c3.9%203.9%208.2%205.6%2013.2%205.6s9.3-1.8%2013.2-5.6L287%2095.7c3.9-3.9%205.6-8.2%205.6-13.2%200-5-1.8-9.3-5.6-13.1z%22%2F%3E%3C%2Fsvg%3E');
+}
+
+/* Character Count Styling */
+.char-count {
+  margin-top: 0.75rem; /* mt-3, adjusted for more spacing */
+  width: 100%;
+  text-align: right;
+  font-size: 0.8rem; /* Slightly smaller font */
+  color: #6b7280;
+  padding-top: 0.25rem; /* Small padding top */
+  border-top: 1px dashed #e2e8f0; /* Subtle separator */
+}
+
+.dark .char-count {
+  color: #9ca3af;
+  border-top: 1px dashed #3f3f46;
+}
+
+/* Tiptap Editor Content Area (ProseMirror) */
+.tiptap-editor-container .ProseMirror {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 1.5rem; /* Increased padding */
+  outline: none;
+  min-height: 400px;
+  line-height: 1.7; /* Slightly more line height for readability */
+  word-wrap: break-word;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #adb5bd;
+  pointer-events: none;
+  height: 0;
+}
+
+/* Tailwind Typography 'prose' plugin styling */
+/* The .prose class applied by Tailwind typography is fine,
+   but we'll override specific Tiptap elements that need more control */
+.prose {
+  color: #374151;
+}
+.dark .prose {
+  color: #e5e7eb;
+}
+
+/* Basic ProseMirror Focus Styles (for text nodes) */
+.ProseMirror:focus {
+  outline: none;
+}
+
+/* Images */
+.tiptap-image-node {
+  display: block; /* Essential for margin: auto to work */
+  max-width: 100%;
+  height: auto;
+  margin: 0; /* Reset prose's default margins */
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.tiptap-image-node.ProseMirror-selectednode {
+  outline: 2px solid #6C63FF;
+  outline-offset: 2px; /* Add slight offset for better visibility */
+}
+
+/* Image alignment within data-node-type="imageLink" container */
+/* We want the image itself to align, not the container's text */
+[data-node-type="imageLink"][data-text-align="left"] .tiptap-image-node {
+  margin-left: 0;
+  margin-right: auto;
+  /* Optional: float if you want text wrapping */
+  /* float: left;
+  margin-right: 1em; */
+}
+[data-node-type="imageLink"][data-text-align="center"] .tiptap-image-node {
+  margin-left: auto;
+  margin-right: auto;
+}
+[data-node-type="imageLink"][data-text-align="right"] .tiptap-image-node {
+  margin-left: auto;
+  margin-right: 0;
+  /* Optional: float if you want text wrapping */
+  /* float: right;
+  margin-left: 1em; */
+}
+
+/* Tables */
+.ProseMirror table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0; /* Add some vertical space around tables */
+  table-layout: fixed; /* Helps with column resizing */
+}
+
+.ProseMirror th,
+.ProseMirror td {
+  border: 1px solid #cad1d8; /* Light border for cells */
+  padding: 0.75em 1em;
+  vertical-align: top;
+  box-sizing: border-box; /* Crucial for resizable columns */
+  position: relative; /* For resizable handles */
+}
+
+.dark .ProseMirror th,
+.dark .ProseMirror td {
+  border-color: #4b5563; /* Darker border for cells */
+}
+
+.ProseMirror th {
+  font-weight: bold;
+  text-align: left;
+  background-color: #f8f9fa; /* Light background for headers */
+}
+
+.dark .ProseMirror th {
+  background-color: #27272a; /* Darker background for headers */
+}
+
+/* Table Resizing Handles */
+.ProseMirror .column-resize-handle {
+  position: absolute;
+  right: -2px; /* Adjusted slightly */
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: #6C63FF; /* Vibrant color */
+  pointer-events: none;
+  border-radius: 2px;
+}
+
+.ProseMirror .tableWrapper {
+  overflow-x: auto; /* Essential for responsive tables */
+  margin: 1.5em 0; /* Match table margin */
+  padding-bottom: 0.5rem; /* Space for scrollbar */
+}
+
+.ProseMirror .resize-cursor {
+  cursor: ew-resize;
+  cursor: col-resize;
+}
+
+/* Code Blocks */
+.ProseMirror pre {
+  background: #f0f0f0;
+  padding: 0.85rem 1.25rem; /* Slightly more padding */
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-family: "Cascadia Code", "Fira Code", "JetBrains Mono", monospace;
+  font-size: 0.9rem; /* Slightly larger code font */
+  line-height: 1.5;
+  color: #333;
+  border: 1px solid #e2e8f0; /* Add a subtle border */
+}
+
+.dark .ProseMirror pre {
+  background: #27272a;
+  color: #e5e7eb;
+  border-color: #3f3f46;
+}
+
+.ProseMirror pre code {
+  padding: 0;
+  background: none;
+  white-space: pre;
+}
+
+/* Blockquote */
+.ProseMirror blockquote {
+  border-left: 4px solid #6C63FF; /* More prominent border */
+  padding-left: 1.2rem; /* Slightly more padding */
+  margin: 1.5em 0; /* Add more vertical space */
+  font-style: italic;
+  color: #555;
+}
+
+.dark .ProseMirror blockquote {
+  border-color: #887dfa; /* Lighter shade for dark mode */
+  color: #bbb;
+}
+
+/* Lists */
+.ProseMirror ul,
+.ProseMirror ol {
+  padding-left: 2rem; /* More indent */
+  margin: 1em 0; /* Vertical spacing */
+}
+.ProseMirror li > p:first-child {
+  margin-top: 0;
+}
+.ProseMirror li > p:last-child {
+  margin-bottom: 0;
+}
+
+
+/* Horizontal Rule */
+.ProseMirror hr {
+  border: none;
+  border-top: 2px solid #e2e8f0; /* Thicker, more visible rule */
+  margin: 2rem 0; /* More spacing */
+}
+.dark .ProseMirror hr {
+  border-color: #3f3f46;
+}
+
+
+/* Links */
+.ProseMirror a {
+  color: #3b82f6;
+  text-decoration: none; /* Remove default underline */
+  border-bottom: 1px solid #3b82f6; /* Custom underline */
+  transition: all 0.2s ease;
+}
+
+.ProseMirror a:hover {
+  color: #2563eb;
+  border-color: #2563eb;
+}
+
+.dark .ProseMirror a {
+  color: #60a5fa;
+  border-color: #60a5fa;
+}
+
+.dark .ProseMirror a:hover {
+  color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+/* Highlight (background color) */
+.ProseMirror mark {
+  background-color: #bae6fd;
+  padding: 0.1em 0.3em; /* Slightly more padding */
+  border-radius: 0.2em;
+  box-decoration-break: clone; /* Ensures styling on wrapped lines */
+}
+
+/* Superscript/Subscript */
+.ProseMirror sub, .ProseMirror sup {
+  font-size: 0.75em;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+.ProseMirror sup {
+  top: -0.5em;
+}
+.ProseMirror sub {
+  bottom: -0.25em;
+}
+
+/* ProseMirror specific selection styling */
+.ProseMirror-selectednode {
+  background-color: #e0f2fe; /* Light blue background for selected block nodes */
+  border-radius: 0.25rem;
+}
+.dark .ProseMirror-selectednode {
+  background-color: #334155; /* Darker blue for dark mode */
+}
+
+
+.tiptap-fullscreen {
+  position: fixed; /* Fixes the editor to the viewport */
+  top: 0;
+  left: 0;
+  width: 100vw; /* Take full viewport width */
+  height: 100vh; /* Take full viewport height */
+  z-index: 9999; /* Ensure it's on top of everything else */
+  border-radius: 0 !important; /* Remove border-radius in fullscreen */
+  max-height: 100vh !important; /* Override max-height */
+}
+
+/* Adjustments for the editor content area in fullscreen */
+.tiptap-fullscreen .ProseMirror {
+  min-height: calc(100vh - 56px - 16px) !important; /* Full height minus menubar and padding */
+  /* 56px (menubar height) + 16px (approx padding) - adjust as needed based on your menubar height */
+}
+
+/* Ensure the scrollable area takes full height in fullscreen */
+.tiptap-fullscreen > div.flex.flex-col.flex-grow.overflow-y-auto.relative {
+  height: 100%; /* Make this container take full height */
+}
+
+/* Optional: Hide body scrollbar when in fullscreen */
+body.tiptap-fullscreen-active {
+  overflow: hidden;
+}
+
+/* Style for the active button state (optional, based on your existing setup) */
+.tiptap-menubar button.is-active {
+  background-color: #d1d5db; /* A slightly darker gray for active state */
+  color: #1f2937; /* Darker text for active state */
+  /* Add dark mode equivalents if needed */
+  background-color: #3f3f46; /* Darker zinc for active state in dark mode */
+  color: #e5e7eb; /* Lighter text for active state in dark mode */
+}
