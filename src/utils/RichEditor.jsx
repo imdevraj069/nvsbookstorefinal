@@ -2,17 +2,19 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
+import debounce from "lodash.debounce";
 
-// Dynamic import with better error handling
+// Dynamically import Froala
 const FroalaEditorComponent = dynamic(
-  () => import("react-froala-wysiwyg").catch(err => {
-    console.error("Failed to load Froala Editor:", err);
-    return () => <div>Editor failed to load</div>;
-  }),
+  () =>
+    import("react-froala-wysiwyg").catch((err) => {
+      console.error("Failed to load Froala Editor:", err);
+      return () => <div>Editor failed to load</div>;
+    }),
   {
     ssr: false,
-    loading: () => <div className="p-4">Loading editor...</div>
+    loading: () => <div className="p-4">Loading editor...</div>,
   }
 );
 
@@ -21,11 +23,21 @@ let stylesLoaded = false;
 export default function FroalaEditor({ content, onChange }) {
   const [model, setModel] = useState(content || "");
   const [editorReady, setEditorReady] = useState(false);
+  const editorRef = useRef(null);
+  const initialContent = useRef(content); // prevent looping update
+
+  // Debounced onChange callback
+  const debouncedOnChange = useMemo(
+    () =>
+      debounce((value) => {
+        if (onChange) onChange(value);
+      }, 300),
+    [onChange]
+  );
 
   useEffect(() => {
     if (!stylesLoaded && typeof window !== "undefined") {
       try {
-        // Load Froala scripts
         require("froala-editor/js/froala_editor.pkgd.min.js");
         require("froala-editor/js/plugins/align.min.js");
         require("froala-editor/js/plugins/code_view.min.js");
@@ -40,7 +52,6 @@ export default function FroalaEditor({ content, onChange }) {
         require("froala-editor/js/plugins/lists.min.js");
         require("froala-editor/js/plugins/paragraph_format.min.js");
 
-        // Load Froala styles
         require("froala-editor/css/froala_editor.pkgd.min.css");
         require("froala-editor/css/froala_style.min.css");
         require("froala-editor/css/themes/dark.min.css");
@@ -56,16 +67,27 @@ export default function FroalaEditor({ content, onChange }) {
     }
   }, []);
 
+  // Only sync prop content once (if changed externally)
   useEffect(() => {
-    if (content !== model) {
+    if (content !== initialContent.current) {
       setModel(content || "");
+      initialContent.current = content;
     }
   }, [content]);
 
   const handleModelChange = (newContent) => {
-    setModel(newContent);
-    if (onChange) {
-      onChange(newContent);
+    if (newContent !== model) {
+      setModel(newContent);
+      debouncedOnChange(newContent);
+
+      // Save undo step manually
+      if (editorRef.current?.editor) {
+        try {
+          editorRef.current.editor.undo.saveStep();
+        } catch (e) {
+          console.warn("Undo step failed", e);
+        }
+      }
     }
   };
 
@@ -79,12 +101,9 @@ export default function FroalaEditor({ content, onChange }) {
     imageUpload: true,
     imageUploadURL: "/api/upload",
     imageAllowedTypes: ["jpeg", "jpg", "png", "gif", "webp"],
-    imageMaxSize: 5 * 1024 * 1024, // 5MB
-    
-    // Enhanced z-index settings to fix toolbar visibility
+    imageMaxSize: 5 * 1024 * 1024,
     zIndex: 1000,
-    imageInlineToolbarInside: false,
-    
+
     events: {
       "image.inserted": function () {
         this.events.focus(true);
@@ -108,26 +127,19 @@ export default function FroalaEditor({ content, onChange }) {
       "image.error": function (error, response) {
         console.error("Image upload error:", error, response);
       },
-      "image.focused": function ($img) {
-        // Force toolbar to be visible with higher z-index
+      "image.focused": function () {
         setTimeout(() => {
           const toolbar = this.$tb;
-          if (toolbar) {
-            toolbar.css('z-index', '10000');
-          }
-          // Also fix inline toolbar z-index
-          const inlineToolbar = this.$box.find('.fr-toolbar.fr-inline');
-          if (inlineToolbar.length) {
-            inlineToolbar.css('z-index', '10000');
-          }
+          if (toolbar) toolbar.css("z-index", "10000");
+          const inlineToolbar = this.$box.find(".fr-toolbar.fr-inline");
+          if (inlineToolbar.length) inlineToolbar.css("z-index", "10000");
         }, 100);
         this.toolbar.showInline();
       },
       "initialized": function () {
         console.log("Froala Editor initialized");
-        
-        // Add custom CSS for better toolbar visibility
-        const style = document.createElement('style');
+
+        const style = document.createElement("style");
         style.textContent = `
           .fr-toolbar.fr-inline {
             z-index: 10000 !important;
@@ -139,7 +151,6 @@ export default function FroalaEditor({ content, onChange }) {
           .fr-image-resizer {
             z-index: 9999 !important;
           }
-          /* Enhanced table resizing */
           .fr-table-resizer {
             background: #1976d2 !important;
             cursor: col-resize !important;
@@ -147,7 +158,6 @@ export default function FroalaEditor({ content, onChange }) {
           .fr-table-resizer.fr-horizontal {
             cursor: row-resize !important;
           }
-          /* Better cell selection visibility */
           .fr-selected-cell {
             background-color: rgba(25, 118, 210, 0.1) !important;
             border: 2px solid #1976d2 !important;
@@ -156,22 +166,20 @@ export default function FroalaEditor({ content, onChange }) {
         document.head.appendChild(style);
       },
       "table.inserted": function () {
-        // Table resizing is handled automatically by tableResizer config
         console.log("Table inserted with resizing enabled");
-      }
+      },
     },
-    
+
     htmlAllowTags: [
-      "a", "img", "p", "div", "span", "br", "strong", "em", "u", "s", 
-      "h1", "h2", "h3", "h4", "h5", "h6", "ul", "ol", "li", "table", 
-      "thead", "tbody", "tr", "td", "th", "blockquote", "hr"
+      "a", "img", "p", "div", "span", "br", "strong", "em", "u", "s",
+      "h1", "h2", "h3", "h4", "h5", "h6", "ul", "ol", "li", "table",
+      "thead", "tbody", "tr", "td", "th", "blockquote", "hr",
     ],
     htmlAllowedAttrs: [
-      "href", "src", "alt", "style", "class", "width", "height", 
-      "target", "title", "data-*", "id", "colspan", "rowspan"
+      "href", "src", "alt", "style", "class", "width", "height",
+      "target", "title", "data-*", "id", "colspan", "rowspan",
     ],
-    
-    // Enhanced image settings
+
     imageDefaultAlign: "center",
     imageDefaultDisplay: "block",
     imageResizeWithPercent: true,
@@ -181,8 +189,7 @@ export default function FroalaEditor({ content, onChange }) {
       "|", "imageLink", "linkOpen", "linkEdit", "linkRemove",
       "-", "imageDisplay", "imageStyle", "imageAlt", "imageSize"
     ],
-    
-    // Enhanced table settings with resizing and cell background
+
     tableStyles: {
       'fr-table-borders': 'Borders',
       'fr-table-gray-1': 'Gray 1',
@@ -211,7 +218,7 @@ export default function FroalaEditor({ content, onChange }) {
     tableResizer: true,
     tableResizerOffset: 5,
     tableResizingLimit: 30,
-    
+
     toolbarButtons: [
       "bold", "italic", "underline", "strikeThrough", "subscript", "superscript",
       "|", "fontFamily", "fontSize", "textColor", "backgroundColor", "clearFormatting",
@@ -222,12 +229,12 @@ export default function FroalaEditor({ content, onChange }) {
       "|", "undo", "redo", "fullscreen", "html"
     ],
     toolbarButtonsXS: [
-      "bold", "italic", "underline", "|", "alignLeft", "alignCenter", "alignRight", 
+      "bold", "italic", "underline", "|", "alignLeft", "alignCenter", "alignRight",
       "|", "insertLink", "insertImage", "|", "undo", "redo"
     ],
     toolbarButtonsSM: [
-      "bold", "italic", "underline", "strikeThrough", "|", "fontFamily", "fontSize", 
-      "|", "alignLeft", "alignCenter", "alignRight", "|", "formatOL", "formatUL", 
+      "bold", "italic", "underline", "strikeThrough", "|", "fontFamily", "fontSize",
+      "|", "alignLeft", "alignCenter", "alignRight", "|", "formatOL", "formatUL",
       "|", "insertLink", "insertImage", "insertTable", "|", "undo", "redo", "fullscreen"
     ],
     toolbarButtonsMD: "toolbarButtons",
@@ -247,6 +254,7 @@ export default function FroalaEditor({ content, onChange }) {
   return (
     <div className="border rounded-xl overflow-hidden bg-white dark:bg-zinc-900 min-h-[500px] relative">
       <FroalaEditorComponent
+        ref={editorRef}
         tag="textarea"
         model={model}
         onModelChange={handleModelChange}
