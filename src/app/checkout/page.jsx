@@ -2,7 +2,7 @@ import CheckoutForm from "@/components/store/checkout-form"
 import OrderSummary from "@/components/store/order-summary"
 
 export const metadata = {
-  title: "Checkout - GovNotify",
+  title: "Checkout - Nvs Book Store",
   description: "Complete your purchase",
 }
 

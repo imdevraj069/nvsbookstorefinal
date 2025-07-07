@@ -14,7 +14,7 @@ export async function generateMetadata({ params }) {
   const product = await res.json()
 
   return {
-    title: `${product.title} - GovNotify Store`,
+    title: `${product.title} - Nvs Book Store`,
     description: product.description,
   }
 }
