@@ -16,7 +16,7 @@ export default function FeaturedProducts() {
       try {
         const res = await axios.get('/api/product')
         const data = await res.data;
-        const products = data.data
+        const products = data.data || [];
         const featuredProducts = products.filter((product) =>
           product.isFeatured === true
         )

@@ -17,8 +17,12 @@ export default function LatestUpdatesSection() {
     const fetchNotifications = async () =>{
       try {
         const res = await axios.get('/api/notification');
-        const data = await res.data;
-        setAllNotifications(data.data);
+        const products = await res.data.data || [];
+
+        const allProducts = products.filter((product) =>
+          product.isFeatured === true
+        )
+        setAllNotifications(allProducts);
       } catch (error) {
         console.error(error)
       }finally{
