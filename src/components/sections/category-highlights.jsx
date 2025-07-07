@@ -27,7 +27,7 @@ const categories = [
     title: "Photo Frames",
     description: "Get Your Customised photo Frames",
     icon: Frame,
-    href: "/store?photo-frame",
+    href: "/store?q=photo-frame",
     gradient: "from-emerald-500 to-teal-500",
     bgGradient:
       "from-emerald-50 to-teal-50 dark:from-emerald-950/50 dark:to-teal-950/50",
