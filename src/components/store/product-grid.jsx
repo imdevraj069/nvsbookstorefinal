@@ -67,7 +67,7 @@ export default function ProductGrid({
     filtered.sort((a, b) => {
       switch (sortBy) {
         case "latest":
-          return b.createdAt?.localeCompare(a.createdAt || "") || 0;
+          return b.date?.localeCompare(a.date || "") || 0;
         case "price-low":
           return a.price - b.price;
         case "price-high":
