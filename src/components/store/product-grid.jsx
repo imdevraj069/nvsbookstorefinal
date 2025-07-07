@@ -90,8 +90,11 @@ export default function ProductGrid({
     const fetchProducts = async () => {
       try {
         const res = await axios.get('/api/product');
-        const data = await res.data.data
-        setAllProducts(data || []);
+        const products = await res.data.data || []; 
+         // Filter only visible products
+        const visibleProducts = products.filter(product => product.isVisible === true);
+
+        setAllProducts(visibleProducts);
       } catch (err) {
         setError(err.message || "Failed to fetch products");
       } finally {
