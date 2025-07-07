@@ -32,6 +32,7 @@ export default function ProductTab() {
     try {
       const res = await axios.get("/api/product");
       setProducts(res.data.data);
+      console.log(res.data.data);
     } catch (err) {
       console.error("Error fetching products:", err);
     }
@@ -176,6 +177,7 @@ export default function ProductTab() {
                 <th className="text-left p-3 sm:p-4">Image</th>
                 <th className="text-left p-3 sm:p-4">Title</th>
                 <th className="text-left p-3 sm:p-4">Category</th>
+                <th className="text-left p-3 sm:p-4">Date</th>
                 <th className="text-left p-3 sm:p-4">Price</th>
                 <th className="text-left p-3 sm:p-4">Stock</th>
                 <th className="text-left p-3 sm:p-4">Status</th>
@@ -208,6 +210,12 @@ export default function ProductTab() {
                       {product.category?.name}
                     </Badge>
                   </td>
+                  <td className="p-3 sm:p-4">
+                    <Badge variant="outline" className="text-xs">
+                      {product.date?.slice(0, 10)}
+                    </Badge>
+                  </td>
+
                   <td className="p-3 sm:p-4">
                     <div className="space-y-1">
                       <div className="font-medium">₹{product.price}</div>
