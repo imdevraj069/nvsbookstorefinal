@@ -43,7 +43,7 @@ export async function GET(req) {
     const notifications = await getNotifications();
     return Response.json(notifications);
   } catch (error) {
-    console.error(err);
+    console.error(error);
     return new Response("Internal Server Error", { status: 500 });
   }
 }
