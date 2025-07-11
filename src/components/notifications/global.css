@@ -47,14 +47,15 @@
 .mycontent table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
   margin-bottom: 1rem;
 }
 
 .mycontent td, .mycontent th {
   border: 1px solid #ccc;
-  padding: 8px;
+  padding: 4px 8px;
 }
 
 .mycontent td[style], .mycontent th[style] {
-  padding: 8px !important;
+  padding: 4px 8px !important;
 }

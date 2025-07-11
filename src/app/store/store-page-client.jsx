@@ -308,7 +308,7 @@ export default function StorePageClient() {
         <div className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950 dark:to-orange-950 lg:border lg:border-border lg:rounded-b-lg lg:p-6">
           <ProductGrid
             showPagination={true}
-            itemsPerPage={12}
+            itemsPerPage={200}
             filters={filters}
           />
         </div>
