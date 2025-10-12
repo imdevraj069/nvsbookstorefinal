@@ -257,6 +257,9 @@ export default function NotificationCategoryPage() {
 
                     <Link
                       href={`/notification/${notification._id}`}
+                      //new tab
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="hover:underline"
                     >
                       <h3 className="text-lg font-semibold mb-2 hover:text-primary transition-colors">

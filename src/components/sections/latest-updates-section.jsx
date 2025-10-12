@@ -141,6 +141,8 @@ export default function LatestUpdatesSection() {
                     >
                       <Link
                         href={`/notification/${notification._id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="group block"
                       >
                         <div className="rounded-lg hover:bg-white/50 dark:hover:bg-black/20 transition-colors">

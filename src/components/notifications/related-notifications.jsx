@@ -20,6 +20,9 @@ export default async function RelatedNotifications({ category, currentId }) {
           <Link
             key={notification._id}
             href={`/notification/${notification._id}`}
+            //open in new tab
+            target="_blank"
+            rel="noopener noreferrer"
             className="block group"
           >
             <div className="border border-border rounded-lg p-4 h-full hover:border-primary/50 transition-colors">

@@ -66,7 +66,10 @@ export default function NotificationCard({ notification, index = 0 }) {
             </div>
           </div>
 
-          <Link href={`/notification/${id}`} className="hover:underline">
+          <Link href={`/notification/${id}`} 
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:underline">
             <motion.h3
               className="text-lg font-semibold mb-2"
               whileHover={{ color: "hsl(var(--primary))" }}
@@ -111,7 +114,9 @@ export default function NotificationCard({ notification, index = 0 }) {
 
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button size="sm" variant="ghost" asChild>
-                <Link href={`/notification/${id}`}>Read More</Link>
+                <Link href={`/notification/${id}`} 
+                      target="_blank"
+                      rel="noopener noreferrer">Read More</Link>
               </Button>
             </motion.div>
           </div>
