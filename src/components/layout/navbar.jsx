@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"; // ShadCN
 import { ModeToggle } from "@/components/ui/theme-toggeler";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useSession, signOut } from "next-auth/react";
@@ -40,6 +40,7 @@ import {
   FaGavel,
 } from "react-icons/fa";
 import Marquee from "@/components/marquee"
+import TagSearch from "@/components/tag-search"
 
 export default function Navbar() {
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -340,6 +341,11 @@ export default function Navbar() {
                 </NavigationMenuItem>
               </NavigationMenuList>
             </NavigationMenu>
+          </div>
+
+          {/* Tag Search Bar - Hidden on mobile */}
+          <div className="hidden lg:flex flex-1 px-8">
+            <TagSearch type="notification" />
           </div>
 
           {/* Right Icons */}

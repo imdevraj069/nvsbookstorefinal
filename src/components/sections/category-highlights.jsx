@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Briefcase, GraduationCap, IdCard, Store, Frame } from "lucide-react";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import {
   FaWhatsapp,
   FaTelegramPlane,

@@ -1,11 +1,11 @@
 import ProductDetail from "@/components/store/product-detail"
 // import RelatedProducts from "@/components/store/related-products"
 import { notFound } from "next/navigation"
-import {getProductbyId} from "@/handler/product"
+import {getProductbySlug} from "@/handler/product"
 
 export async function generateMetadata({ params }) {
   const param = await params
-  const res = await getProductbyId(param.productId)
+  const res = await getProductbySlug(param.slug)
 
   if (!res.ok) {
     return { title: "Product Not Found" }
@@ -21,7 +21,7 @@ export async function generateMetadata({ params }) {
 
 export default async function ProductPage({ params }) {
   const param = await params
-  const res = await getProductbyId(param.productId)
+  const res = await getProductbySlug(param.slug)
 
   if (!res.ok) {
     notFound()

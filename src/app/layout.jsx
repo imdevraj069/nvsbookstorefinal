@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Providers } from "@/lib/provider";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import FloatingSupport from "@/components/floating"
+import ScrollNavThumb from "@/components/scroll-nav-thumb"
 
 import 'froala-editor/css/froala_editor.pkgd.min.css';
 import 'froala-editor/css/froala_style.min.css';
@@ -58,6 +59,7 @@ export default function RootLayout({ children }) {
                 }}
               />
               <Navbar />
+              <ScrollNavThumb />
               {children}
               <Analytics />
               <FloatingSupport/>

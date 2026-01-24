@@ -46,6 +46,11 @@ const productSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    slug: {
+      type: String,
+      unique: true,
+      trim: true,
+    },
     description: {
       type: String,
       required: true,
@@ -139,6 +144,11 @@ const productSchema = new mongoose.Schema(
     date: {
       type: Date,
       default: Date.now,
+    },
+    tags: {
+      type: [String],
+      default: [],
+      index: true,
     },
   },
   {

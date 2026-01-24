@@ -49,6 +49,7 @@ export default function CartItems() {
     <div className="space-y-4">
       {cartItems.map((item, index) => {
         const id = item._id;
+        const slug = item.slug;
         const isLoading = loadingMap[id];
 
         return (
@@ -63,7 +64,7 @@ export default function CartItems() {
 
             <div className="flex-grow">
               <Link
-                href={`/store/${id}`}
+                href={`/store/${slug}`}
                 className="font-semibold hover:text-primary"
               >
                 {item.title}

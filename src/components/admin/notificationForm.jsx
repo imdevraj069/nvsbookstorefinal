@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import toast from "react-hot-toast";
 import FroalaEditor from "@/utils/RichEditor";
+import TagInput from "@/components/admin/tag-input";
 
 const tabs = ["Basic Info", "Details", "Content", "Links", "Dates", "Settings"];
 
@@ -40,6 +41,7 @@ export default function NotificationForm({
     date: "",
     isVisible: true,
     isFeatured: false,
+    tags: [],
     ...formData,
   });
 
@@ -465,6 +467,16 @@ export default function NotificationForm({
                 Is Featured
               </Label>
             </div>
+
+            <TagInput
+              value={form.tags || []}
+              onChange={(newTags) =>
+                setForm((prev) => ({ ...prev, tags: newTags }))
+              }
+              label="Tags"
+              placeholder="Add relevant tags (e.g., exam, admit-card, result)"
+              disabled={loading}
+            />
           </div>
         );
 

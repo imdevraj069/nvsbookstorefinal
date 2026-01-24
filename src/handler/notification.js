@@ -2,6 +2,36 @@ import { Notification, NotificationCategory } from "../models/notification";
 import connectDB from "@/lib/dbConnect";
 import { redis } from "@/lib/redis";
 
+// Helper function to generate slug from title
+function generateSlug(title) {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/[\s_]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+// Helper function to ensure slug is unique by appending a number if needed
+async function getUniqueSlug(baseSlug, excludeId = null) {
+  let slug = baseSlug;
+  let counter = 1;
+
+  while (true) {
+    const query = { slug };
+    if (excludeId) {
+      query._id = { $ne: excludeId };
+    }
+
+    const existing = await Notification.findOne(query);
+    if (!existing) {
+      return slug;
+    }
+
+    slug = `${baseSlug}-${counter}`;
+    counter++;
+  }
+}
 
 export async function getNotifications() {
   await connectDB();
@@ -10,11 +40,30 @@ export async function getNotifications() {
 
   const cached = await redis.get(cachekey);
   if (cached) {
-    ( "Cache hit" );
     return { source: "redis", data: cached };
+    console.log("Fetched notifications from Redis cache", cached);
   }
 
-  const notifications = await Notification.find({}).sort({ date: -1 }).lean();
+  let notifications = await Notification.find({}).sort({ date: -1 }).lean();
+  
+  // Generate slugs for notifications that don't have them
+  const notificationsWithoutSlugs = notifications.filter(n => !n.slug);
+  if (notificationsWithoutSlugs.length > 0) {
+    console.log(`⚠️ Generating ${notificationsWithoutSlugs.length} missing slugs...`);
+    
+    for (const notification of notificationsWithoutSlugs) {
+      const baseSlug = generateSlug(notification.title);
+      const uniqueSlug = await getUniqueSlug(baseSlug, notification._id);
+      
+      // Update in database
+      await Notification.findByIdAndUpdate(notification._id, { slug: uniqueSlug });
+    }
+    
+    // Clear cache and refetch
+    await redis.del(cachekey);
+    notifications = await Notification.find({}).sort({ date: -1 }).lean();
+  }
+  
   await redis.set(cachekey, notifications, { ex: 3600 });
 
   return { source: "mongo", data: notifications };
@@ -31,9 +80,29 @@ export async function getNotificationsByCategory(category) {
   }
 
   // If not in cache, fetch from MongoDB
-  const filtered = await Notification.find({ "category.slug": category })
+  let filtered = await Notification.find({ "category.slug": category })
     .sort({ date: -1 })
     .lean();
+
+  // Generate slugs for notifications that don't have them
+  const notificationsWithoutSlugs = filtered.filter(n => !n.slug);
+  if (notificationsWithoutSlugs.length > 0) {
+    console.log(`⚠️ Generating ${notificationsWithoutSlugs.length} missing slugs for category ${category}...`);
+    
+    for (const notification of notificationsWithoutSlugs) {
+      const baseSlug = generateSlug(notification.title);
+      const uniqueSlug = await getUniqueSlug(baseSlug, notification._id);
+      
+      // Update in database
+      await Notification.findByIdAndUpdate(notification._id, { slug: uniqueSlug });
+    }
+    
+    // Clear cache and refetch
+    await redis.del(cacheKey);
+    filtered = await Notification.find({ "category.slug": category })
+      .sort({ date: -1 })
+      .lean();
+  }
 
   // Cache in Redis for 1 hour
   await redis.set(cacheKey, filtered, { ex: 3600 });
@@ -59,6 +128,12 @@ export async function getNotfCatHandler() {
 export async function getNotificationById(id){
   await connectDB();
   const notification = await Notification.findById(id).lean();
+  return Response.json(notification);
+}
+
+export async function getNotificationBySlug(slug){
+  await connectDB();
+  const notification = await Notification.findOne({ slug }).lean();
   return Response.json(notification);
 }
 

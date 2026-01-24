@@ -12,6 +12,7 @@ export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const type = searchParams.get("type");
   const category = searchParams.get("category");
+  const search = searchParams.get("search");
 
   try {
     if (type === "category") {
@@ -36,12 +37,35 @@ export async function GET(req) {
       }
     }
 
-    if (type === "bycategory") {
-      const notifications = await getNotificationsByCategory(category);
-      return Response.json(notifications);
+    // Search by tags or title
+    if (type === "search" && search) {
+      try {
+        const searchQuery = {
+          $or: [
+            { title: { $regex: search, $options: "i" } },
+            { tags: { $in: [new RegExp(search, "i")] } },
+            { description: { $regex: search, $options: "i" } },
+          ],
+        };
+        const results = await Notification.find(searchQuery)
+          .sort({ date: -1 })
+          .lean();
+        return Response.json({ source: "mongo", data: results });
+      } catch (error) {
+        console.error(error);
+        return Response.json(
+          { error: "Error searching notifications" },
+          { status: 500 }
+        );
+      }
     }
-    const notifications = await getNotifications();
-    return Response.json(notifications);
+
+    if (type === "bycategory") {
+      const result = await getNotificationsByCategory(category);
+      return Response.json(result);
+    }
+    const result = await getNotifications();
+    return Response.json(result);
   } catch (error) {
     console.error(error);
     return new Response("Internal Server Error", { status: 500 });

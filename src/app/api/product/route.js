@@ -10,11 +10,35 @@ import { Product } from "@/models/product";
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const type = searchParams.get("type");
+  const search = searchParams.get("search");
 
   try {
     if (type === "category") {
       const categories = await getProductCatHandler();
       return Response.json(categories);
+    }
+
+    // Search by tags or title
+    if (type === "search" && search) {
+      try {
+        const searchQuery = {
+          $or: [
+            { title: { $regex: search, $options: "i" } },
+            { tags: { $in: [new RegExp(search, "i")] } },
+            { description: { $regex: search, $options: "i" } },
+          ],
+        };
+        const results = await Product.find(searchQuery)
+          .sort({ date: -1 })
+          .lean();
+        return Response.json({ source: "mongo", data: results });
+      } catch (error) {
+        console.error(error);
+        return Response.json(
+          { error: "Error searching products" },
+          { status: 500 }
+        );
+      }
     }
 
     const result = await getProductsHandler();

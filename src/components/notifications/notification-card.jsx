@@ -8,7 +8,7 @@ import { motion } from "framer-motion"
 import { isNotificationNew } from "@/lib/data"
 
 export default function NotificationCard({ notification, index = 0 }) {
-  const { id, title, date, category, description, pdfUrl, applyUrl, websiteUrl } = notification
+  const { id, slug, title, date, category, description, pdfUrl, applyUrl, websiteUrl } = notification
 
   // Format date
   const formattedDate = new Date(date).toLocaleDateString("en-US", {
@@ -66,7 +66,7 @@ export default function NotificationCard({ notification, index = 0 }) {
             </div>
           </div>
 
-          <Link href={`/notification/${id}`} 
+          <Link href={`/notification/${slug}`} 
                       target="_blank"
                       rel="noopener noreferrer"
                       className="hover:underline">

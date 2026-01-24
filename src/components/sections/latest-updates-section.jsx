@@ -19,7 +19,6 @@ export default function LatestUpdatesSection() {
         const res = await axios.get('/api/notification');
         const products = await res.data.data || [];
         console.log(products);
-
         const allProducts = products.filter((product) =>
           product.isVisible === true
         )
@@ -140,7 +139,7 @@ export default function LatestUpdatesSection() {
                       }}
                     >
                       <Link
-                        href={`/notification/${notification._id}`}
+                        href={`/notification/${notification.slug}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="group block"

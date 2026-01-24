@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import toast from "react-hot-toast";
 import Image from "next/image";
 import RichEditor from "@/utils/RichEditor";
+import TagInput from "@/components/admin/tag-input";
 
 const tabs = [
   "Basic Info",
@@ -60,6 +61,7 @@ export default function ProductForm({
     isbn: "",
     specifications: {},
     date: "",
+    tags: [],
   };
 
   const [formData, setFormData] = useState(defaultFormData);
@@ -97,7 +99,6 @@ export default function ProductForm({
       ...formData,
       category: selectedCategory,
     };
-    console.log(dataToSend);
     try {
       await onSubmit(dataToSend);
       handleCancel();
@@ -524,7 +525,7 @@ export default function ProductForm({
 
       case 4:
         return (
-          <>
+          <div className="space-y-4">
             <Label>
               <input
                 type="checkbox"
@@ -558,7 +559,16 @@ export default function ProductForm({
               onChange={handleChange}
               value={formData.date}
             />
-          </>
+            
+            <TagInput
+              value={formData.tags || []}
+              onChange={(newTags) =>
+                setFormData((prev) => ({ ...prev, tags: newTags }))
+              }
+              label="Tags"
+              placeholder="Add relevant tags (e.g., books, competitive-exams, upsc)"
+            />
+          </div>
         );
 
       case 5:

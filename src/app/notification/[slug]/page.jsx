@@ -1,11 +1,11 @@
-import { getNotificationById } from "@/handler/notification"
+import { getNotificationBySlug } from "@/handler/notification"
 import NotificationDetail from "@/components/notifications/notification-detail"
 import RelatedNotifications from "@/components/notifications/related-notifications"
 import { notFound } from "next/navigation"
 
 export async function generateMetadata({ params }) {
   const param = await params
-  const res = await getNotificationById(param.id)
+  const res = await getNotificationBySlug(param.slug)
   const notification = await res.json()
 
   if (!notification) {
@@ -22,7 +22,7 @@ export async function generateMetadata({ params }) {
 
 export default async function NotificationPage({ params }) {
   const param = await params
-  const res = await getNotificationById(param.id)
+  const res = await getNotificationBySlug(param.slug)
   const notification = await res.json()
 
   if (!notification) {
