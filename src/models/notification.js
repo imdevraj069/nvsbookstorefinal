@@ -21,6 +21,11 @@ const notificationSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  slug: {
+    type: String,
+    unique: true,
+    trim: true,
+  },
   description: {
     type: String,
     required: true,
@@ -84,6 +89,11 @@ const notificationSchema = new mongoose.Schema({
   isfeatured: {
     type: Boolean,
     default: false,
+  },
+  tags: {
+    type: [String],
+    default: [],
+    index: true,
   },
 });
 

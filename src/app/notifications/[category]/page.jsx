@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import CategoryHeader from "@/components/ui/category-header";
 import FilterBar from "@/components/ui/filter-bar";
 import { Calendar, ArrowRight } from "lucide-react";
@@ -256,7 +256,7 @@ export default function NotificationCategoryPage() {
                     </div>
 
                     <Link
-                      href={`/notification/${notification._id}`}
+                      href={`/notification/${notification.slug}`}
                       //new tab
                       target="_blank"
                       rel="noopener noreferrer"

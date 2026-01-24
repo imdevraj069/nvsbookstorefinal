@@ -2,6 +2,36 @@ import {Product, Category} from "@/models/product"
 import connectDB from "@/lib/dbConnect"
 import {redis} from "@/lib/redis"
 
+// Helper function to generate slug from title
+function generateSlug(title) {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/[\s_]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+// Helper function to ensure slug is unique by appending a number if needed
+async function getUniqueSlug(baseSlug, excludeId = null) {
+  let slug = baseSlug;
+  let counter = 1;
+
+  while (true) {
+    const query = { slug };
+    if (excludeId) {
+      query._id = { $ne: excludeId };
+    }
+
+    const existing = await Product.findOne(query);
+    if (!existing) {
+      return slug;
+    }
+
+    slug = `${baseSlug}-${counter}`;
+    counter++;
+  }
+}
 
 export async function getProductsHandler() {
   await connectDB(); // <--- ✅ connect MongoDB before any queries
@@ -15,11 +45,34 @@ export async function getProductsHandler() {
   }
 
   // Fetch from MongoDB and cache
-  const products = await Product.find({})
+  let products = await Product.find({})
   .sort({
     date: -1
   })
   .lean();
+  
+  // Generate slugs for products that don't have them
+  const productsWithoutSlugs = products.filter(p => !p.slug);
+  if (productsWithoutSlugs.length > 0) {
+    console.log(`⚠️ Generating ${productsWithoutSlugs.length} missing slugs for products...`);
+    
+    for (const product of productsWithoutSlugs) {
+      const baseSlug = generateSlug(product.title);
+      const uniqueSlug = await getUniqueSlug(baseSlug, product._id);
+      
+      // Update in database
+      await Product.findByIdAndUpdate(product._id, { slug: uniqueSlug });
+    }
+    
+    // Clear cache and refetch
+    await redis.del(cacheKey);
+    products = await Product.find({})
+      .sort({
+        date: -1
+      })
+      .lean();
+  }
+  
   await redis.set(cacheKey, products, { ex: 3600 });
 
   return { source: 'mongo', data: products };
@@ -45,6 +98,28 @@ export async function getProductbyId(id){
 
   await connectDB(); //
   const product = await Product.findById(id).lean();
+  return Response.json(product);
+}
+
+export async function getProductbySlug(slug){
+  await connectDB();
+  let product = await Product.findOne({ slug }).lean();
+  
+  // If product not found by slug but has a title, try to generate the slug
+  if (!product) {
+    return Response.json(null);
+  }
+  
+  // Ensure the product has a slug (in case it was missing)
+  if (!product.slug) {
+    const baseSlug = generateSlug(product.title);
+    const uniqueSlug = await getUniqueSlug(baseSlug, product._id);
+    
+    // Update in database
+    await Product.findByIdAndUpdate(product._id, { slug: uniqueSlug });
+    product.slug = uniqueSlug;
+  }
+  
   return Response.json(product);
 }
 

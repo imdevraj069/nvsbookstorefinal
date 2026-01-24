@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 export default function ProductStrip({ product }) {
   const {
     _id,
+    slug,
     title,
     description,
     price,
@@ -32,7 +33,7 @@ export default function ProductStrip({ product }) {
     <div className="flex w-full border border-border lg:rounded-lg overflow-hidden hover:border-primary/50 transition-colors bg-amber-50 dark:bg-secondary">
       {/* Image */}
       <Link
-        href={`/store/${_id}`}
+        href={`/store/${slug}`}
         className="w-24 sm:w-40 overflow-clip h-auto relative flex-shrink-0 bg-muted"
       >
         <Image
@@ -63,7 +64,7 @@ export default function ProductStrip({ product }) {
       {/* Info */}
       <div className="flex flex-col justify-between flex-1 p-3">
         <div>
-          <Link href={`/store/${_id}`}>
+          <Link href={`/store/${slug}`}>
             <h3 className="text-sm font-semibold text-primary hover:underline line-clamp-1">
               {title}
             </h3>

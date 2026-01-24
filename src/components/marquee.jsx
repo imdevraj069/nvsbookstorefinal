@@ -39,7 +39,7 @@ export default function NotMarquee() {
             {featuredNotifications.map((item) => (
               <Link
                 key={item._id || item.id}
-                href={`notification/${item._id}`}
+                href={`/notification/${item.slug}`}
                 className="mx-8 hover:underline text-sm"
               >
                 {item.title}

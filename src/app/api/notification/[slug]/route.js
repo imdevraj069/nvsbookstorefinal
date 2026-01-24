@@ -7,7 +7,7 @@ import {toggleVisibility, deleteNotification, updateNotification} from "../../..
 export async function GET(req, {params}){
   await connectDB()
   const param = await params;
-  const notification = await Notification.findById(param.id);
+  const notification = await Notification.findOne({ slug: param.slug });
 
   if(!notification) return Response.json( {error: "Notification not found"}, {status: 404} )
 
@@ -19,9 +19,12 @@ export async function PUT(req, { params }) {
   try {
     const param = await params;
     const body = await req.json();
-    const updated = await updateNotification( param.id, body );
-    if (!updated) return Response.json({ error: "Notification not found" }, { status: 404 });
-    return Response.json(updated);
+    const notification = await Notification.findOne({ slug: param.slug });
+    if (!notification) return Response.json({ error: "Notification not found" }, { status: 404 });
+    
+    Object.assign(notification, body);
+    await notification.save();
+    return Response.json(notification);
   } catch (err) {
     return Response.json({ error: err.message }, { status: 500 });
   }
@@ -31,8 +34,12 @@ export async function PUT(req, { params }) {
 export async function PATCH(req, { params }) {
   try {
     const param = await params;
-    const res = await toggleVisibility(param.id);
-    return Response.json(res);
+    const notification = await Notification.findOne({ slug: param.slug });
+    if (!notification) return Response.json({ error: "Notification not found" }, { status: 404 });
+    
+    notification.isVisible = !notification.isVisible;
+    await notification.save();
+    return Response.json(notification);
   } catch (err) {
     return Response.json({ error: err.message }, { status: 500 });
   }
@@ -42,7 +49,8 @@ export async function PATCH(req, { params }) {
 export async function DELETE(req, { params }) {
   try {
     const param = await params;
-    const deleted = await deleteNotification(param.id);
+    const deleted = await Notification.findOneAndDelete({ slug: param.slug });
+    if (!deleted) return Response.json({ error: "Notification not found" }, { status: 404 });
     return Response.json(deleted);
   } catch (err) {
     return Response.json({ error: err.message }, { status: 500 });

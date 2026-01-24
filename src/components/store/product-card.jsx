@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 export default function ProductCard({ product }) {
   const {
     _id,
+    slug,
     title,
     description,
     price,
@@ -28,7 +29,7 @@ export default function ProductCard({ product }) {
   return (
     <div className="group h-full flex flex-col border border-border rounded-lg overflow-hidden transition-colors bg-amber-50 dark:bg-secondary">
       {/* Image */}
-      <Link href={`/store/${_id}`} className="block">
+      <Link href={`/store/${slug}`} className="block">
         <div className="relative aspect-[5/3] bg-muted">
           <Image
             src={image || "/placeholder.svg?height=200&width=300"}
@@ -78,7 +79,7 @@ export default function ProductCard({ product }) {
         </div> */}
 
         {/* Title */}
-        <Link href={`/store/${_id}`} className="mt-2">
+        <Link href={`/store/${slug}`} className="mt-2">
           <h3 className="text-base font-semibold line-clamp-1 group-hover:text-primary">
             {title}
           </h3>

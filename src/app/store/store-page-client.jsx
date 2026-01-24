@@ -3,7 +3,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import ProductGrid from "@/components/store/product-grid";
 import CategoryHeader from "@/components/ui/category-header";
 import { Button } from "@/components/ui/button";

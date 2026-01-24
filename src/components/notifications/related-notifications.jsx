@@ -19,7 +19,7 @@ export default async function RelatedNotifications({ category, currentId }) {
         {filtered.map((notification) => (
           <Link
             key={notification._id}
-            href={`/notification/${notification._id}`}
+            href={`/notification/${notification.slug}`}
             //open in new tab
             target="_blank"
             rel="noopener noreferrer"

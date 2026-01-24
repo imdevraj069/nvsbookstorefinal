@@ -32,7 +32,6 @@ export default function ProductTab() {
     try {
       const res = await axios.get("/api/product");
       setProducts(res.data.data);
-      console.log(res.data.data);
     } catch (err) {
       console.error("Error fetching products:", err);
     }

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion,} from "motion/react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, BookOpen, Star, Users } from "lucide-react";
 
@@ -27,7 +27,7 @@ export default function HeroSection() {
         transition={{ duration: 1.2, ease: "easeOut" }}
       >
         <Image
-          src="/storeimage.jpg?height=1080&width=1920"
+          src="/storeimage.jpg"
           alt="NVS Book Store Background"
           fill
           className="object-cover object-center blur-xs"
