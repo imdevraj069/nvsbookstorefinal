@@ -7,8 +7,12 @@ export default function ScrollNavThumb() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [thumbPosition, setThumbPosition] = useState(0);
+  const [dragBottom, setDragBottom] = useState(0);
 
   useEffect(() => {
+    // Set drag constraints based on window height
+    setDragBottom(window.innerHeight - 60);
+
     const handleScroll = () => {
       const scrollTop = window.scrollY;
       const docHeight =
@@ -34,12 +38,12 @@ export default function ScrollNavThumb() {
     const rect = scrollBar.getBoundingClientRect();
     const y = e.clientY - rect.top;
 
-    const newPosition = Math.max(0, Math.min(y, window.innerHeight - 60));
+    const newPosition = Math.max(0, Math.min(y, dragBottom));
     setThumbPosition(newPosition);
 
     const docHeight =
       document.documentElement.scrollHeight - window.innerHeight;
-    const scrollPercent = (newPosition / (window.innerHeight - 60)) * 100;
+    const scrollPercent = (newPosition / dragBottom) * 100;
     window.scrollTo({
       top: (scrollPercent / 100) * docHeight,
       behavior: "smooth",
@@ -60,7 +64,7 @@ export default function ScrollNavThumb() {
         document.removeEventListener("mouseup", handleMouseUp);
       };
     }
-  }, [isDragging]);
+  }, [isDragging, dragBottom]);
 
   return (
     <div className="hidden xl:fixed xl:right-4 xl:top-1/2 xl:-translate-y-1/2 xl:flex xl:flex-col xl:items-center xl:z-40">
@@ -81,18 +85,18 @@ export default function ScrollNavThumb() {
           drag="y"
           dragConstraints={{
             top: 0,
-            bottom: window.innerHeight - 60,
+            bottom: dragBottom,
           }}
           onDragStart={() => setIsDragging(true)}
           onDragEnd={() => setIsDragging(false)}
           onDrag={(e, { offset }) => {
             const newPosition = Math.max(
               0,
-              Math.min(offset.y, window.innerHeight - 60)
+              Math.min(offset.y, dragBottom)
             );
             const docHeight =
               document.documentElement.scrollHeight - window.innerHeight;
-            const scrollPercent = (newPosition / (window.innerHeight - 60)) * 100;
+            const scrollPercent = (newPosition / dragBottom) * 100;
             window.scrollTo({
               top: (scrollPercent / 100) * docHeight,
               behavior: "auto",

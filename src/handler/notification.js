@@ -41,7 +41,6 @@ export async function getNotifications() {
   const cached = await redis.get(cachekey);
   if (cached) {
     return { source: "redis", data: cached };
-    console.log("Fetched notifications from Redis cache", cached);
   }
 
   let notifications = await Notification.find({}).sort({ date: -1 }).lean();

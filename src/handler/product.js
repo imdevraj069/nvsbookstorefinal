@@ -105,9 +105,9 @@ export async function getProductbySlug(slug){
   await connectDB();
   let product = await Product.findOne({ slug }).lean();
   
-  // If product not found by slug but has a title, try to generate the slug
+  // If product not found by slug, return null
   if (!product) {
-    return Response.json(null);
+    return null;
   }
   
   // Ensure the product has a slug (in case it was missing)
@@ -120,7 +120,8 @@ export async function getProductbySlug(slug){
     product.slug = uniqueSlug;
   }
   
-  return Response.json(product);
+  // Convert to plain JSON object to ensure it can be passed to Client Components
+  return JSON.parse(JSON.stringify(product));
 }
 
 export async function createProdCatHandler(newCategory){

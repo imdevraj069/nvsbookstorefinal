@@ -5,13 +5,11 @@ import {getProductbySlug} from "@/handler/product"
 
 export async function generateMetadata({ params }) {
   const param = await params
-  const res = await getProductbySlug(param.slug)
+  const product = await getProductbySlug(param.slug)
 
-  if (!res.ok) {
+  if (!product) {
     return { title: "Product Not Found" }
   }
-
-  const product = await res.json()
 
   return {
     title: `${product.title} - Nvs Book Store`,
@@ -21,13 +19,11 @@ export async function generateMetadata({ params }) {
 
 export default async function ProductPage({ params }) {
   const param = await params
-  const res = await getProductbySlug(param.slug)
+  const product = await getProductbySlug(param.slug)
 
-  if (!res.ok) {
+  if (!product) {
     notFound()
   }
-
-  const product = await res.json()
 
   return (
     <div className="container mx-auto px-4 py-8">
