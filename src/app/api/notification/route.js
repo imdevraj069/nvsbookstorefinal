@@ -4,7 +4,8 @@ import {
   getNotfCatHandler,
   createNotCatHandler,
   createNotificationHandler,
-  toggleField
+  toggleField,
+  duplicateNotificationHandler
 } from "@/handler/notification";
 import { Notification } from "@/models/notification.js";
 
@@ -82,6 +83,12 @@ export async function POST(req) {
     if(type === "category"){
       const newCategory = await createNotCatHandler(data);
       return Response.json(newCategory);
+    }
+
+    if(type === "duplicate"){
+      const { notificationId } = data;
+      const result = await duplicateNotificationHandler(notificationId);
+      return Response.json(result, { status: result.success ? 200 : 500 });
     }
 
     const newNotification = await createNotificationHandler(data)

@@ -51,12 +51,18 @@ export default function NotificationsTab() {
   };
 
   const duplicateNotification = async (notification) => {
-    const { _id, ...data } = notification;
     try {
-      const res = await axios.post("/api/notification", { data });
-      const newNotification = res.data.data;
-      setNotifications((prev) => [...prev, newNotification]);
-      toast.success("Notification duplicated successfully");
+      const res = await axios.post("/api/notification?type=duplicate", { 
+        data: { notificationId: notification._id }
+      });
+      
+      if (res.data.success) {
+        const newNotification = res.data.data;
+        setNotifications((prev) => [...prev, newNotification]);
+        toast.success("Notification duplicated successfully. You can now edit it.");
+      } else {
+        toast.error(res.data.message || "Failed to duplicate notification");
+      }
     } catch (err) {
       console.error("Failed to duplicate notification", err);
       toast.error("Failed to duplicate notification. Please try again.");

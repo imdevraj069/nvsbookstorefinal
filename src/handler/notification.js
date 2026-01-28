@@ -277,6 +277,65 @@ export async function updateNotification(id, data){
   }
 }
 
+export async function duplicateNotificationHandler(id) {
+  await connectDB();
+
+  try {
+    const original = await Notification.findById(id);
+    if (!original) {
+      return {
+        success: false,
+        message: "Notification not found",
+      };
+    }
+
+    // Create a copy of the notification data
+    const duplicateData = {
+      title: `${original.title} (Copy)`,
+      description: original.description,
+      content: original.content,
+      category: original.category,
+      date: new Date(),
+      department: original.department,
+      location: original.location,
+      pdfUrl: original.pdfUrl,
+      applyUrl: original.applyUrl,
+      websiteUrl: original.websiteUrl,
+      loginUrl: original.loginUrl,
+      resultUrl: original.resultUrl,
+      admitCardUrl: original.admitCardUrl,
+      lastDate: original.lastDate,
+      isVisible: original.isVisible,
+      isfeatured: false, // Don't duplicate featured status
+      tags: original.tags,
+    };
+
+    // Generate a unique slug for the duplicated notification
+    const baseSlug = generateSlug(duplicateData.title);
+    const uniqueSlug = await getUniqueSlug(baseSlug);
+    duplicateData.slug = uniqueSlug;
+
+    // Create the new notification
+    const newNotification = await Notification.create(duplicateData);
+
+    // Clear Redis cache
+    await redis.del("notifications");
+
+    return {
+      success: true,
+      message: "Notification duplicated successfully",
+      data: newNotification,
+    };
+  } catch (error) {
+    console.error("❌ Error duplicating notification:", error);
+    return {
+      success: false,
+      message: "Something went wrong while duplicating notification",
+      error: error.message,
+    };
+  }
+}
+
 export async function toggleField({ id, field, model, cacheKey = "notifications" }) {
   await connectDB();
 
