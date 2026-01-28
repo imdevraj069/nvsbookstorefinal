@@ -1,5 +1,6 @@
 import connectDB from "@/lib/dbConnect";
 import {Notification} from "@/models/notification"
+import { redis } from "@/lib/redis";
 
 import {toggleVisibility, deleteNotification, updateNotification} from "../../../../handler/notification"
 
@@ -43,6 +44,14 @@ export async function PUT(req, { params }) {
     Object.assign(notification, body);
     await notification.save();
     
+    // Clear Redis cache to reflect the update
+    await redis.del("notifications");
+    
+    // Also clear category cache if category was updated
+    if (body.category && body.category.slug) {
+      await redis.del(`notifications:category:${body.category.slug}`);
+    }
+    
     console.log("✅ Notification updated successfully");
     return Response.json(notification);
   } catch (err) {
@@ -72,6 +81,15 @@ export async function PATCH(req, { params }) {
     
     notification.isVisible = !notification.isVisible;
     await notification.save();
+    
+    // Clear Redis cache to reflect the update
+    await redis.del("notifications");
+    
+    // Also clear category cache if notification has a category
+    if (notification.category && notification.category.slug) {
+      await redis.del(`notifications:category:${notification.category.slug}`);
+    }
+    
     console.log("✅ Notification PATCH successful");
     return Response.json(notification);
   } catch (err) {
@@ -97,6 +115,14 @@ export async function DELETE(req, { params }) {
     if (!deleted) {
       console.log("❌ Notification not found");
       return Response.json({ error: "Notification not found" }, { status: 404 });
+    }
+    
+    // Clear Redis cache to reflect the deletion
+    await redis.del("notifications");
+    
+    // Also clear category cache if notification had a category
+    if (deleted.category && deleted.category.slug) {
+      await redis.del(`notifications:category:${deleted.category.slug}`);
     }
     
     console.log("✅ Notification deleted successfully:", deleted.title);
