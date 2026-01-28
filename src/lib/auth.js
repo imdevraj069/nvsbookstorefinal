@@ -139,5 +139,6 @@ export const authOptions = {
     signIn: "auth/login",
   },
 
+  truHost: true,
   secret: process.env.NEXTAUTH_SECRET,
 }
