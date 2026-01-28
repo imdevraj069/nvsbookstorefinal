@@ -76,15 +76,14 @@ export default function NotificationsTab() {
     if (!confirm("Are you sure you want to delete this notification?")) return;
 
     try {
+      console.log("🗑️ Deleting notification with ID:", id);
       const res = await axios.delete(`/api/notification/${id}`);
-      if (!res.data.success) {
-        toast.error(res.data.message);
-        return;
-      }
+      console.log("✅ Delete response:", res.data);
+      
       setNotifications((prev) => prev.filter((n) => n._id !== id));
       toast.success("Notification deleted successfully!");
     } catch (err) {
-      console.error("Deletion error:", err);
+      console.error("❌ Deletion error:", err);
       toast.error("Failed to delete notification");
     }
   };

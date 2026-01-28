@@ -83,15 +83,14 @@ export default function ProductTab() {
     if (!confirm("Are you sure you want to delete this product?")) return;
 
     try {
+      console.log("🗑️ Deleting product with ID:", id);
       const res = await axios.delete(`/api/product/${id}`);
-      if (!res.data.success) {
-        toast.error(res.data.message);
-        return;
-      }
+      console.log("✅ Delete response:", res.data);
+      
       setProducts((prev) => prev.filter((p) => p._id !== id));
       toast.success("Product deleted successfully!");
     } catch (err) {
-      console.error("Deletion error:", err);
+      console.error("❌ Deletion error:", err);
       toast.error("Failed to delete product");
     }
   };

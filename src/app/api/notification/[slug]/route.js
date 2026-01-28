@@ -55,13 +55,27 @@ export async function PUT(req, { params }) {
 export async function PATCH(req, { params }) {
   try {
     const param = await params;
-    const notification = await Notification.findOne({ slug: param.slug });
-    if (!notification) return Response.json({ error: "Notification not found" }, { status: 404 });
+    console.log("🔄 PATCH /api/notification - ID:", param.slug);
+    
+    // Try to find by ID first, then by slug as fallback
+    let notification = await Notification.findById(param.slug);
+    
+    if (!notification) {
+      console.log("⚠️ Not found by ID, trying slug...");
+      notification = await Notification.findOne({ slug: param.slug });
+    }
+    
+    if (!notification) {
+      console.log("❌ Notification not found");
+      return Response.json({ error: "Notification not found" }, { status: 404 });
+    }
     
     notification.isVisible = !notification.isVisible;
     await notification.save();
+    console.log("✅ Notification PATCH successful");
     return Response.json(notification);
   } catch (err) {
+    console.error("❌ PATCH error:", err);
     return Response.json({ error: err.message }, { status: 500 });
   }
 }
@@ -70,10 +84,25 @@ export async function PATCH(req, { params }) {
 export async function DELETE(req, { params }) {
   try {
     const param = await params;
-    const deleted = await Notification.findOneAndDelete({ slug: param.slug });
-    if (!deleted) return Response.json({ error: "Notification not found" }, { status: 404 });
+    console.log("🗑️ DELETE /api/notification - ID:", param.slug);
+    
+    // Try to find by ID first, then by slug as fallback
+    let deleted = await Notification.findByIdAndDelete(param.slug);
+    
+    if (!deleted) {
+      console.log("⚠️ Not found by ID, trying slug...");
+      deleted = await Notification.findOneAndDelete({ slug: param.slug });
+    }
+    
+    if (!deleted) {
+      console.log("❌ Notification not found");
+      return Response.json({ error: "Notification not found" }, { status: 404 });
+    }
+    
+    console.log("✅ Notification deleted successfully:", deleted.title);
     return Response.json(deleted);
   } catch (err) {
+    console.error("❌ DELETE error:", err);
     return Response.json({ error: err.message }, { status: 500 });
   }
 }
