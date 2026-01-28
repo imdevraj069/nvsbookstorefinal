@@ -279,15 +279,19 @@ export async function updateNotification(id, data){
 
 export async function duplicateNotificationHandler(id) {
   await connectDB();
+  console.log("🔄 duplicateNotificationHandler called with ID:", id);
 
   try {
     const original = await Notification.findById(id);
     if (!original) {
+      console.log("❌ Notification not found with ID:", id);
       return {
         success: false,
         message: "Notification not found",
       };
     }
+
+    console.log("📝 Original notification found:", original.title);
 
     // Create a copy of the notification data
     const duplicateData = {
@@ -312,14 +316,18 @@ export async function duplicateNotificationHandler(id) {
 
     // Generate a unique slug for the duplicated notification
     const baseSlug = generateSlug(duplicateData.title);
+    console.log("🔤 Base slug generated:", baseSlug);
     const uniqueSlug = await getUniqueSlug(baseSlug);
+    console.log("🔤 Unique slug assigned:", uniqueSlug);
     duplicateData.slug = uniqueSlug;
 
     // Create the new notification
     const newNotification = await Notification.create(duplicateData);
+    console.log("✅ New notification created with slug:", newNotification.slug);
 
     // Clear Redis cache
     await redis.del("notifications");
+    console.log("🗑️ Redis cache cleared");
 
     return {
       success: true,

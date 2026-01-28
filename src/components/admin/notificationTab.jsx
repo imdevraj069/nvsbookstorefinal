@@ -52,9 +52,12 @@ export default function NotificationsTab() {
 
   const duplicateNotification = async (notification) => {
     try {
+      console.log("🔄 Attempting to duplicate notification:", notification.title);
       const res = await axios.post("/api/notification?type=duplicate", { 
         data: { notificationId: notification._id }
       });
+      
+      console.log("📨 Duplicate response:", res.data);
       
       if (res.data.success) {
         const newNotification = res.data.data;
@@ -64,7 +67,7 @@ export default function NotificationsTab() {
         toast.error(res.data.message || "Failed to duplicate notification");
       }
     } catch (err) {
-      console.error("Failed to duplicate notification", err);
+      console.error("❌ Failed to duplicate notification", err);
       toast.error("Failed to duplicate notification. Please try again.");
     }
   };

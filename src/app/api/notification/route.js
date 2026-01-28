@@ -76,25 +76,31 @@ export async function GET(req) {
 export async function POST(req) {
   const { searchParams } = new URL(req.url);
   const type = searchParams.get("type");
+  console.log("📨 POST /api/notification - Type:", type);
   try {
     const body = await req.json();
     const { data } = body;
+    console.log("📨 Request data:", { type, data });
 
     if(type === "category"){
+      console.log("Creating new category...");
       const newCategory = await createNotCatHandler(data);
       return Response.json(newCategory);
     }
 
     if(type === "duplicate"){
+      console.log("🔄 Duplicating notification with ID:", data.notificationId);
       const { notificationId } = data;
       const result = await duplicateNotificationHandler(notificationId);
+      console.log("🔄 Duplication result:", result);
       return Response.json(result, { status: result.success ? 200 : 500 });
     }
 
+    console.log("Creating new notification...");
     const newNotification = await createNotificationHandler(data)
     return Response.json(newNotification);
   } catch (error) {
-    console.error(error);
+    console.error("❌ POST /api/notification error:", error);
     return new Response("Internal Server Error", { status: 500 });
   }
 }

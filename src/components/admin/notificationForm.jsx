@@ -133,9 +133,13 @@ export default function NotificationForm({
         },
       };
 
+      console.log("📝 Submitting notification:", { editMode, currentEditId, dataToSend });
+
       const res = editMode
         ? await axios.put(`/api/notification/${currentEditId}`, dataToSend)
         : await axios.post("/api/notification", { data: dataToSend });
+
+      console.log("✅ Response:", res.data);
 
       toast.success(
         `Notification ${editMode ? "updated" : "created"} successfully`
@@ -145,7 +149,7 @@ export default function NotificationForm({
         onSuccess(res.data.data, editMode);
       }
     } catch (error) {
-      console.error("Error submitting notification:", error);
+      console.error("❌ Error submitting notification:", error);
       const errorMessage =
         error.response?.data?.message ||
         "Failed to submit notification. Please try again.";
